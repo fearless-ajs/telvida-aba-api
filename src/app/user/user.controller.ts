@@ -22,7 +22,6 @@ import ResponseController, {
   IResponseWithDataCollection,
   IResponseWithMessage
 } from "@libs/helpers/response-controller";
-import JwtAuthGuard from "../auth/guards/jwt-auth.guard";
 import {User} from "./entities/user.entity";
 import { AccessTokenPermission, Guest } from "@libs/decorators";
 import { CurrentUser } from "@libs/decorators/current-user.decorator";

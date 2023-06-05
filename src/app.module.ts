@@ -6,7 +6,7 @@ import {DatabaseModule} from "@libs/database/database.module";
 import {RmqModule} from "@libs/rmq/rmq.module";
 import { AuthModule } from "@app/auth/auth.module";
 import { APP_GUARD } from "@nestjs/core";
-import JwtAuthGuard from "@app/auth/guards/jwt-auth.guard";
+import JwtAuthGuard from "@libs/Guards/jwt-auth/jwt-auth.guard";
 
 @Module({
   imports: [
@@ -38,11 +38,6 @@ import JwtAuthGuard from "@app/auth/guards/jwt-auth.guard";
       provide: APP_GUARD,
       useClass: JwtAuthGuard
     },
-    // {
-    //   provide: 'EMAIL',
-    //   useValue: EMAIL_SERVICE,
-    // },
-
   ]
 })
 export class AppModule {}

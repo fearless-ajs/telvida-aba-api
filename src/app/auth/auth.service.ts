@@ -10,7 +10,8 @@ import { ResetPasswordTokenDto } from "./dto/reset-password-token.dto";
 import { TJwtPayload, TTokens } from "@libs/types/auth";
 import * as argon from "argon2";
 import { SignInDto } from "@app/auth/dto/sign-in.dto";
-import { VerifyTokenDto } from "@app/auth/dto/verify-token.dto";
+import { AuthEmailService } from "@libs/mail/auth-email/auth-email.service";
+import { string } from "joi";
 
 export interface TokenPayload {
   userId: string;
@@ -22,6 +23,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly authEmailService: AuthEmailService
   ) {}
 
   async login(signInDto: SignInDto):  Promise<TTokens> {
@@ -112,9 +114,8 @@ export class AuthService {
     }
 
     // Send the token to the user email
-    // this.emailHandlerService.resendTokenEmail(user, user.verificationToken)
+    await this.authEmailService.resendVerificationTokenMessage(user);
 
-    // .
     return true;
   }
 
@@ -134,8 +135,7 @@ export class AuthService {
       passwordResetToken: code
     });
 
-    // this.emailHandlerService.forgotPasswordEmail(user, code.toString())
-
+    await this.authEmailService.sendForgotPasswordMessage(user, code);
     return true;
   }
 
@@ -154,8 +154,7 @@ export class AuthService {
       passwordChangedAt: Date.now()
     });
 
-    // this.emailHandlerService.passwordUpdatedEmail(user);
-
+    await this.authEmailService.sendPasswordUpdatedMessage(updated_user)
     return true;
 
   }
@@ -189,7 +188,8 @@ export class AuthService {
       updatedAt: Date.now()
     });
 
-    // this.emailHandlerService.sendEmailVerified(user)
+    // Send verification email to user
+    await this.authEmailService.sendAccountVerificationMessage(user_details);
     return user_details
   }
 

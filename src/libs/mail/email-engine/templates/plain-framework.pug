@@ -1,0 +1,9 @@
+extends baseEmail
+
+block content
+  div(style='text-align: center')
+    img(src='https://www.telvida.com/img/sigla-top-telvida.jpg' style='width: 89px; height: 47px')
+  hr
+  div(style='margin-top: 30px')
+    p #{payload.message}
+  p - #{payload.appInfo.appEmail}, #{payload.appInfo.appName}

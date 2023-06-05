@@ -15,6 +15,7 @@ import {UserRepository} from "./user.repository";
 import {User, UserDocument} from "./entities/user.entity";
 import { deleteFile } from "@libs/helpers/file-processor";
 import {ConfigService} from "@nestjs/config";
+import { AuthEmailService } from "@libs/mail/auth-email/auth-email.service";
 
 @Injectable()
 export class UserService{
@@ -22,6 +23,7 @@ export class UserService{
       @InjectModel(User.name) private userModel: Model<UserDocument>,
       private readonly userRepository: UserRepository,
       private readonly configService: ConfigService,
+      private readonly authEmailService: AuthEmailService
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -37,17 +39,17 @@ export class UserService{
     if (await this.findOneByEmail(email)) throw new ConflictException(`Email exist`)
 
 
-    let user: Promise<User>;
+
     let now = new Date(Date.now());
 
-    user = this.userRepository.create({
+   const user = await this.userRepository.create({
       email,
       password: hash,
       emailVerificationToken: code.toString()
     });
 
     // Email the user concerning the update
-
+    await this.authEmailService.sendWelcomeMessage(user)
 
    return user
   }
@@ -98,7 +100,7 @@ export class UserService{
   }
 
   async findOneByEmail(email: string): Promise<User> {
-    return this.userModel.findOne({ email }).select('+password, +verificationToken');
+    return this.userModel.findOne({ email }).select('+password, +emailVerificationToken');
   }
 
   async findOneByEmailWithPassword(email: string): Promise<User> {

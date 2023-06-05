@@ -1,7 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common";
 import {Ctx, MessagePattern, NatsContext, Payload} from '@nestjs/microservices';
 import {AuthService} from './auth.service';
-import {LocalAuthGuard} from './guards/local-auth.guard';
 import {User} from "../user/entities/user.entity";
 import ResponseController, { IResponseWithData, IResponseWithMessage } from "@libs/helpers/response-controller";
 import {VerifyTokenDto} from "./dto/verify-token.dto";
@@ -9,10 +8,10 @@ import {ResendTokenDto} from "./dto/resed-token.dto";
 import {ForgotPasswordDto} from "./dto/forgot-password.dto";
 import {ResetPasswordTokenDto} from "./dto/reset-password-token.dto";
 import { CreateUserDto } from "../user/dto/create-user.dto";
-import { RefreshTokenGuard } from "@app/auth/guards/refresh-token.guard";
 import { GetCurrentUser, GetCurrentUserId, Guest } from "@libs/decorators";
 import { CurrentUser } from "@libs/decorators/current-user.decorator";
 import { SignInDto } from "@app/auth/dto/sign-in.dto";
+import { RefreshTokenGuard } from "@libs/Guards/refresh-jwt/refresh-jwt.guard";
 
 @Controller()
 export class AuthController extends ResponseController{

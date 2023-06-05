@@ -1,3 +1,9 @@
+export const appInfo = {
+    appName: 'ABA',
+    appEmail: 'aba@telvida.com',
+    companyName: 'ABA LLC',
+    companyPhone: '+234-8138-234-786'
+}
 export const errors = {
     AUTHORIZATION_ERROR: 'AUTHORIZATION_ERROR',
     FORBIDDEN_ERROR: 'ACCESS_DENIED_ERROR',

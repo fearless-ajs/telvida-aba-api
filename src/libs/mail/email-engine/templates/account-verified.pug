@@ -1,0 +1,15 @@
+extends baseEmail
+
+block content
+  p Hi,
+  p Congratulations! Your #{payload.appInfo.name} account has been successfully verified. We are delighted to welcome you to our vibrant community.
+  p With your account now verified, you can fully explore and engage with all the features and benefits #{payload.appInfo.name} offers. Connect with other members, share your experiences, join discussions, and find support from individuals who understand and embrace autism.
+
+  p We are committed to providing a safe and inclusive environment for all our community members. If you ever need assistance or have any questions, feel free to reach out to our support team at [#{payload.appInfo.email} or #{payload.appInfo.phone}]. We are here to help you make the most of your #{payload.appInfo.name} experience.
+
+  p Thank you for choosing #{payload.appInfo.name} as your platform for connection, communication, and support within the autism community. We believe that together, we can foster understanding, promote advocacy, and empower individuals on the autism spectrum.
+
+  small Thank you for joining #{payload.appInfo.name}! We look forward to seeing you actively participate in our platform and making valuable connections within the autism community.
+  br
+  small
+    b - #{payload.appInfo.email}, #{payload.appInfo.name}

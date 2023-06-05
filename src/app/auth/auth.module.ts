@@ -8,6 +8,8 @@ import { LocalStrategy } from './strategies/local.strategy';
 import {UserModule} from "../user/user.module";
 import {DatabaseModule} from "@libs/database/database.module";
 import { RefreshTokenStrategy } from "@app/auth/strategies/refresh-token.strategy";
+import { AuthEmailService } from "@libs/mail/auth-email/auth-email.service";
+import { EmailEngineModule } from "@libs/mail/email-engine/email-engine.module";
 
 @Module({
   imports: [
@@ -19,8 +21,9 @@ import { RefreshTokenStrategy } from "@app/auth/strategies/refresh-token.strateg
       }),
       inject: [ConfigService],
     }),
+    EmailEngineModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, RefreshTokenStrategy],
+  providers: [AuthService, AuthEmailService, LocalStrategy, JwtStrategy, RefreshTokenStrategy],
 })
 export class AuthModule {}
