@@ -7,9 +7,17 @@ import {RmqModule} from "@libs/rmq/rmq.module";
 import { AuthModule } from "@app/auth/auth.module";
 import { APP_GUARD } from "@nestjs/core";
 import JwtAuthGuard from "@libs/Guards/jwt-auth/jwt-auth.guard";
+import { AccessTokenModule } from "@app/access-control/access-token/access-token.module";
+import { ProtectedRouteGuard } from "@libs/Guards/protected-route/protected-route.guard";
+import { AccessTokenRepository } from "@app/access-control/access-token/access-token.repository";
+import { MongooseModule } from "@nestjs/mongoose";
+import { AccessToken, AccessTokenSchema } from "@app/access-control/access-token/entities/access-token.entity";
 
 @Module({
   imports: [
+    MongooseModule.forFeature([
+      { name: AccessToken.name, schema: AccessTokenSchema }
+    ]),
     DatabaseModule,
     RmqModule,
     ConfigModule.forRoot({
@@ -26,14 +34,16 @@ import JwtAuthGuard from "@libs/Guards/jwt-auth/jwt-auth.guard";
       }),
       envFilePath: './.env',
     }),
+    AccessTokenModule,
     AuthModule,
     UserModule,
   ],
   providers: [
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: ProtectedRouteGuard
-    // },
+    AccessTokenRepository,
+    {
+      provide: APP_GUARD,
+      useClass: ProtectedRouteGuard
+    },
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard
