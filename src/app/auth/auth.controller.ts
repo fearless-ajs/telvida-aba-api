@@ -165,4 +165,14 @@ export class AuthController extends ResponseController{
     return this.responseWithData(response_data);
   }
 
+
+
+  @Delete('delete-my-profile')
+  @HttpCode(HttpStatus.ACCEPTED)
+  async removeMyProfile(@CurrentUser() user: TJwtPayload): Promise<IResponseWithMessage> {
+    await this.authService.removeMyProfile(user.userId);
+    return this.responseMessage('Profile deleted');
+  }
+
+
 }

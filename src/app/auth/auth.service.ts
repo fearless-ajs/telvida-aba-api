@@ -213,4 +213,8 @@ export class AuthService {
     return this.userService.update(userId, updateUserDto);
   }
 
+  async removeMyProfile(userId: string): Promise<User> {
+    return this.userService.remove(userId);
+  }
+
 }
