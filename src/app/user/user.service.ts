@@ -128,33 +128,29 @@ export class UserService{
     return this.userModel.findOne({ passwordResetToken: verificationToken });
   }
 
-  async update(id: string, currentUser: any, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const { email } = updateUserDto;
-    console.log(currentUser);
-
-    // check if the logged in user owns the account
-    if (currentUser.userId !== id ){
-      throw new ForbiddenException(`User account data can only be updated by the owner`)
-    }
 
     // Check if the id is valid
     if (!mongoose.isValidObjectId(id)){
+      await deleteFile(updateUserDto.image);
       throw new NotAcceptableException(`Invalid user id (${id})`)
     }
 
     // Find the party exists
     const user = await this.findOne(id)
     if (!user){
+      await deleteFile(updateUserDto.image);
       throw new NotAcceptableException(`Unknown user id (${id})`)
     }
 
     // CHeck if the email already exists.
     if (email){
       if (await this.userModel.findOne({ email,  id: { $ne: id}  })){
+        await deleteFile(updateUserDto.image);
         throw new ConflictException(`Email exist`)
       }
     }
-
 
     delete updateUserDto.password
     if (updateUserDto.image){
@@ -164,10 +160,7 @@ export class UserService{
       updateUserDto.image = user.image;
     }
 
-    return this.userModel.findOneAndUpdate({_id: id}, updateUserDto, {
-      new: true, //To return the updated version of the document
-      runValidators: true // To validate inputs based on the Model schema
-    }).exec();
+    return this.userRepository.findOneAndUpdate({_id: id}, updateUserDto);
   }
 
   async findOneByIdAndUpdate(id: string, userData): Promise<User>{
@@ -178,14 +171,9 @@ export class UserService{
     }).exec()
   }
 
-  async remove(id: string,  currentUser: any,): Promise<User> {
+  async remove(id: string): Promise<User> {
     if (!mongoose.isValidObjectId(id)){
       throw new NotAcceptableException(`Invalid user id (${id})`)
-    }
-
-    // check if the logged in user owns the account
-    if (currentUser.userId !== id ){
-      throw new ForbiddenException(`User account data can only be modified by the owner`)
     }
 
     // Find the election event if i exists

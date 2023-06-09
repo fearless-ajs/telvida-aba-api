@@ -33,6 +33,22 @@ export class User  extends AbstractDocument{
     })
     image?: string
 
+    @Prop({
+        required: false
+    })
+    bio?: string
+
+    @Prop({
+        required: false,
+        default: 'active'
+    })
+    status?: string
+
+    @Prop({
+        required: false
+    })
+    displayName?: string
+
     @Exclude()
     @Prop({
         select: false

@@ -12,6 +12,7 @@ import { ProtectedRouteGuard } from "@libs/Guards/protected-route/protected-rout
 import { AccessTokenRepository } from "@app/access-control/access-token/access-token.repository";
 import { MongooseModule } from "@nestjs/mongoose";
 import { AccessToken, AccessTokenSchema } from "@app/access-control/access-token/entities/access-token.entity";
+import { MulterModule } from "@nestjs/platform-express";
 
 @Module({
   imports: [
@@ -34,16 +35,17 @@ import { AccessToken, AccessTokenSchema } from "@app/access-control/access-token
       }),
       envFilePath: './.env',
     }),
+    MulterModule.register({ dest: './uploads' }),
     AccessTokenModule,
     AuthModule,
     UserModule,
   ],
   providers: [
     AccessTokenRepository,
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: ProtectedRouteGuard
-    // },
+    {
+      provide: APP_GUARD,
+      useClass: ProtectedRouteGuard
+    },
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard

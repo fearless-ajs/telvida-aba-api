@@ -34,50 +34,15 @@ export class UserController extends ResponseController{
 
   @Post()
   @Guest()
-  @AccessTokenPermission('create-user')
   @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(
-      FileInterceptor('image',  {
-        storage: diskStorage({
-          destination: './uploads/images',
-          filename: (req, file, callback) => {
-            const uniqueSuffix =
-                Date.now() + '-' + Math.round(Math.random() * 1e9);
-            const ext = extname(file.originalname);
-            const filename = `${uniqueSuffix}${ext}`;
-            callback(null, filename);
-          },
-        }),
-      })
-  )
-
-  async create(@Body() createUserDto: CreateUserDto,  @UploadedFile(
-      new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 100000 }),
-          new FileTypeValidator({ fileType: 'image/jpeg' }),
-        ],
-        fileIsRequired: false
-      }),
-  ) file: Express.Multer.File): Promise<IResponseWithData> {
-    // @ts-ignore
-    createUserDto.image =  file? file.path:null;
+  async create(@Body() createUserDto: CreateUserDto): Promise<IResponseWithData> {
     const response_data = await this.userService.create(createUserDto);
-    // @ts-ignore
-    const { _id,
-      email,
-      image,
-    } = response_data;
-
-    return this.responseWithData({
-      _id,
-      email,
-      image,
-    });
+    delete response_data.password;
+    delete response_data.emailVerificationToken;
+    return this.responseWithData(response_data);
   }
 
   @Get()
-  @AccessTokenPermission('read-user')
   @HttpCode(HttpStatus.OK)
   async findAll(@Req() req: Request):Promise<IResponseWithDataCollection> {
     const response_data = await this.userService.findAll(req);
@@ -85,7 +50,6 @@ export class UserController extends ResponseController{
   }
 
   @Get(':id')
-  @AccessTokenPermission('read-user')
   @HttpCode(HttpStatus.OK)
   async findOne(@Param('id') id: string): Promise<IResponseWithData> {
     const response_data = await this.userService.findOne(id);
@@ -110,7 +74,7 @@ export class UserController extends ResponseController{
         }),
       })
   )
-  async update(@Param('id') id: string, @CurrentUser() user: User, @Body() updateUserDto: UpdateUserDto,  @UploadedFile(
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto,  @UploadedFile(
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 100000 }),
@@ -119,17 +83,16 @@ export class UserController extends ResponseController{
         fileIsRequired: false
       }),
   ) file: Express.Multer.File): Promise<IResponseWithData> {
-
     updateUserDto.image =  file?file.path:null;
-    const response_data = await this.userService.update(id, user, updateUserDto);
+    const response_data = await this.userService.update(id, updateUserDto);
     return this.responseWithData(response_data);
   }
 
   @Delete(':id')
-  @AccessTokenPermission('delete-user')
   @HttpCode(HttpStatus.ACCEPTED)
-  async remove(@Param('id') id: string, @CurrentUser() user: User): Promise<IResponseWithMessage> {
-    await this.userService.remove(id, user);
+  async remove(@Param('id') id: string): Promise<IResponseWithMessage> {
+    await this.userService.remove(id);
     return this.responseMessage('User deleted');
   }
+
 }

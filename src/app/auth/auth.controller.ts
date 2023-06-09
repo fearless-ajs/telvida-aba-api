@@ -1,4 +1,15 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete, FileTypeValidator,
+  Get,
+  HttpCode,
+  HttpStatus, MaxFileSizeValidator,
+  Param, ParseFilePipe,
+  Post, UploadedFile,
+  UseGuards,
+  UseInterceptors
+} from "@nestjs/common";
 import {Ctx, MessagePattern, NatsContext, Payload} from '@nestjs/microservices';
 import {AuthService} from './auth.service';
 import {User} from "../user/entities/user.entity";
@@ -8,11 +19,16 @@ import {ResendTokenDto} from "./dto/resed-token.dto";
 import {ForgotPasswordDto} from "./dto/forgot-password.dto";
 import {ResetPasswordTokenDto} from "./dto/reset-password-token.dto";
 import { CreateUserDto } from "../user/dto/create-user.dto";
-import { GetCurrentUser, GetCurrentUserId, Guest } from "@libs/decorators";
+import { AccessTokenPermission, GetCurrentUser, GetCurrentUserId, Guest } from "@libs/decorators";
 import { CurrentUser } from "@libs/decorators/current-user.decorator";
 import { SignInDto } from "@app/auth/dto/sign-in.dto";
 import { RefreshTokenGuard } from "@libs/Guards/refresh-jwt/refresh-jwt.guard";
 import { ConfigService } from "@nestjs/config";
+import { TJwtPayload } from "@libs/types";
+import { UpdateUserDto } from "@app/user/dto/update-user.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { diskStorage } from "multer";
+import { extname } from "path";
 
 @Controller()
 export class AuthController extends ResponseController{
@@ -110,6 +126,43 @@ export class AuthController extends ResponseController{
   async logout(@CurrentUser() user: User): Promise<IResponseWithMessage> {
     await this.authService.logout(user);
     return this.responseMessage('Logged out user successfully.');
+  }
+
+  @Get('my-profile')
+  @HttpCode(HttpStatus.ACCEPTED)
+  async myProfile(@CurrentUser() user: TJwtPayload): Promise<IResponseWithData> {
+    const response_data = await this.authService.myProfile(user.userId);
+    return this.responseWithData(response_data);
+  }
+
+  @Post('update-my-profile')
+  @HttpCode(HttpStatus.ACCEPTED)
+  @UseInterceptors(
+    FileInterceptor('image',  {
+      storage: diskStorage({
+        destination: './uploads/images',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `${uniqueSuffix}${ext}`;
+          callback(null, filename);
+        },
+      }),
+    })
+  )
+  async updateMyProfile(@Body() updateUserDto: UpdateUserDto, @CurrentUser() user: TJwtPayload,  @UploadedFile(
+    new ParseFilePipe({
+      validators: [
+        new MaxFileSizeValidator({ maxSize: 100000 }),
+        new FileTypeValidator({ fileType: 'image/jpeg' }),
+      ],
+      fileIsRequired: false
+    }),
+  ) file: Express.Multer.File): Promise<IResponseWithData> {
+    updateUserDto.image =  file? file.path:null;
+    const response_data = await this.authService.updateMyProfile(updateUserDto, user.userId);
+    return this.responseWithData(response_data);
   }
 
 }

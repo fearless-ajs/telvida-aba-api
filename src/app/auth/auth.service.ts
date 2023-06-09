@@ -12,6 +12,7 @@ import * as argon from "argon2";
 import { SignInDto } from "@app/auth/dto/sign-in.dto";
 import { AuthEmailService } from "@libs/mail/auth-email/auth-email.service";
 import { string } from "joi";
+import { UpdateUserDto } from "@app/user/dto/update-user.dto";
 
 export interface TokenPayload {
   userId: string;
@@ -203,4 +204,13 @@ export class AuthService {
     // Unset the existing refreshToken, find a way to null the effect.
 
   }
+
+  async myProfile(userId: string): Promise<User> {
+    return this.userService.findOne(userId);
+  }
+
+  async updateMyProfile(updateUserDto: UpdateUserDto, userId: string): Promise<User> {
+    return this.userService.update(userId, updateUserDto);
+  }
+
 }
