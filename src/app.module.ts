@@ -40,10 +40,10 @@ import { AccessToken, AccessTokenSchema } from "@app/access-control/access-token
   ],
   providers: [
     AccessTokenRepository,
-    {
-      provide: APP_GUARD,
-      useClass: ProtectedRouteGuard
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: ProtectedRouteGuard
+    // },
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard

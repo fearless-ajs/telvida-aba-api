@@ -6,8 +6,4 @@ export class CreateAccessTokenDto {
 
     @IsNotEmpty() @IsDateString()
     expiry_date: Date
-
-    @IsNotEmpty() @IsString() @MaxLength(200)
-    user_id: string // The user that created the token.
-
 }

@@ -24,10 +24,17 @@ export class AccessToken extends AbstractDocument{
     token: string;
 
     @Prop({
+        required: false,
+        default: "aba_access_token"
+    })
+    type?: string;
+
+
+    @Prop({
         type: Date,
         required: true,
     })
-    expiry_date: Date;
+    expiry_date: string;
 
 }
 

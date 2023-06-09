@@ -49,7 +49,7 @@ export class AuthService {
 
   async getTokens(userId: string, email: string): Promise<TTokens> {
     const jwtPayload: TJwtPayload = {
-      sub: userId,
+      userId: userId,
       email: email,
     };
 

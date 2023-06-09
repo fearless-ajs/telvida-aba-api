@@ -20,6 +20,7 @@ import ResponseController, {
 } from "@libs/helpers/response-controller";
 import { User } from "@app/user/entities/user.entity";
 import { CurrentUser } from "@libs/decorators/current-user.decorator";
+import { GetCurrentUserId } from "@libs/decorators";
 
 @Controller('access-tokens')
 export class AccessTokenController extends ResponseController{
@@ -29,8 +30,8 @@ export class AccessTokenController extends ResponseController{
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createAccessTokenDto: CreateAccessTokenDto, @CurrentUser() user: User,): Promise<IResponseWithData> {
-    const response_data = await this.accessTokenService.create(createAccessTokenDto, user._id.toString());
+  async create(@Body() createAccessTokenDto: CreateAccessTokenDto, @GetCurrentUserId() userId: string): Promise<IResponseWithData> {
+    const response_data = await this.accessTokenService.create(createAccessTokenDto, userId);
     return this.responseWithData(response_data);
   }
 

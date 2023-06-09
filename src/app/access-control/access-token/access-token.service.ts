@@ -12,11 +12,7 @@ export class AccessTokenService{
   constructor(private accessTokenRepository: AccessTokenRepository){}
 
   async create(createAccessTokenDto: CreateAccessTokenDto, userId: string): Promise<AccessToken> {
-   const { name, expiry_date, user_id } = createAccessTokenDto;
-
-    // check if the user_id supplied is valid
-    if (!mongoose.isValidObjectId(user_id))
-      throw new NotAcceptableException(`Invalid user id (${user_id})`)
+   const { name, expiry_date } = createAccessTokenDto;
 
     //Check if the access_name exists
     if (await this.findOneByFilter({ name }))
@@ -34,7 +30,7 @@ export class AccessTokenService{
     return await this.accessTokenRepository.create({
       name,
       token,
-      expiry_date,
+      expiry_date: expiry_date.toString(),
       user_id: userId
     });
   }
@@ -58,7 +54,7 @@ export class AccessTokenService{
 
 
   async update(id: string, updateAccessTokenDto: UpdateAccessTokenDto): Promise<AccessToken> {
-    const { name, expiry_date, user_id } = updateAccessTokenDto;
+    const { name, expiry_date} = updateAccessTokenDto;
 
     // Check if the access_code object_id is valid
     if (!mongoose.isValidObjectId(id)) {
@@ -92,12 +88,12 @@ export class AccessTokenService{
       throw new NotAcceptableException(`Invalid access token id (${id})`)
     }
 
-    // Check if the Id exists
+    // Check if the ID exists
     if (!await this.findOne(id)){
       throw new NotFoundException(`Access code id (${id}) does not exist`)
     }
 
-    return  this.accessTokenRepository.findAndDelete({_id: id});
+    return this.accessTokenRepository.findAndDelete({_id: id});
   }
 
   findOneByFilter(filter: any): Promise<AccessToken> {
@@ -123,13 +119,13 @@ export class AccessTokenService{
     }
 
     // Check if the Id exists
-    if (!await this.findOne(id)){
-      throw new NotFoundException(`Access code id (${id}) does not exist`)
+    if (!await this.accessTokenRepository.documentExist({ _id: id })){
+      throw new NotFoundException(`Access token id (${id}) does not exist`)
     }
 
     // Generate access_token
-    const access_token = await this.generateAccessToken();
+    const token = await this.generateAccessToken();
 
-    return this.accessTokenRepository.findOneAndUpdate({_id: id}, {access_token});
+    return this.accessTokenRepository.findOneAndUpdate({_id: id}, {token});
   }
 }

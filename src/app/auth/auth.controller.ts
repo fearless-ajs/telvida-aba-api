@@ -12,10 +12,14 @@ import { GetCurrentUser, GetCurrentUserId, Guest } from "@libs/decorators";
 import { CurrentUser } from "@libs/decorators/current-user.decorator";
 import { SignInDto } from "@app/auth/dto/sign-in.dto";
 import { RefreshTokenGuard } from "@libs/Guards/refresh-jwt/refresh-jwt.guard";
+import { ConfigService } from "@nestjs/config";
 
 @Controller()
 export class AuthController extends ResponseController{
-  constructor(private readonly authService: AuthService) {
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService
+  ) {
     super();
   }
 
@@ -37,8 +41,11 @@ export class AuthController extends ResponseController{
     const response_data = await this.authService.login(signInDto);
     const { user, access_token, refresh_token } = response_data;
     return this.responseWithData({
-      access_token,
-      refresh_token,
+      "access-token": access_token,
+      "refresh-token": refresh_token,
+      "type": "Bearer",
+      "access-token-life-span": this.configService.get<string>('JWT_AUTH_TOKEN_EXPIRATION'),
+      "refresh-token-life-span": this.configService.get<string>('JWT_REFRESH_TOKEN_EXPIRATION'),
       user: user
     });
   }
