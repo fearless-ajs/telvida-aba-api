@@ -154,7 +154,7 @@ export class UserService{
 
     delete updateUserDto.password
     if (updateUserDto.image){
-      // Delete logo
+      // Delete image
       await deleteFile(user.image);
     }else {
       updateUserDto.image = user.image;

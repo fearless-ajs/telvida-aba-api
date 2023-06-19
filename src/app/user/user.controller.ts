@@ -8,7 +8,12 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
-  ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Res, Req, UseGuards, SetMetadata, HttpCode, HttpStatus
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
+  Req,
+  HttpCode,
+  HttpStatus
 } from "@nestjs/common";
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -22,9 +27,7 @@ import ResponseController, {
   IResponseWithDataCollection,
   IResponseWithMessage
 } from "@libs/helpers/response-controller";
-import {User} from "./entities/user.entity";
 import { AccessTokenPermission, Guest } from "@libs/decorators";
-import { CurrentUser } from "@libs/decorators/current-user.decorator";
 
 @Controller('users')
 export class UserController extends ResponseController{

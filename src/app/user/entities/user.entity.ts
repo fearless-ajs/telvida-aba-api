@@ -10,12 +10,34 @@ export class User  extends AbstractDocument{
     @Prop({
         required: false
     })
-    fullname?: string;
+    firstname?: string;
+
+    @Prop({
+        required: false
+    })
+    lastname?: string;
 
     @Prop({
         required: false
     })
     username?: string;
+
+    @Prop({
+        required: false
+    })
+    location?: string;
+
+
+    @Prop({
+        required: false
+    })
+    role?: string
+
+
+    @Prop({
+        required: false
+    })
+    identity_proof?: string
 
     @Prop({
         required: true,
@@ -48,6 +70,7 @@ export class User  extends AbstractDocument{
         required: false
     })
     displayName?: string
+
 
     @Exclude()
     @Prop({
