@@ -1,4 +1,4 @@
 export type TJwtPayload = {
-  email: string;
   userId: string;
+  email: string;
 };

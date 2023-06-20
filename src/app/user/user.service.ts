@@ -129,11 +129,12 @@ export class UserService{
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const { email } = updateUserDto;
+    const { email, username } = updateUserDto;
 
     // Check if the id is valid
     if (!mongoose.isValidObjectId(id)){
       await deleteFile(updateUserDto.image);
+      await deleteFile(updateUserDto.identity_proof);
       throw new NotAcceptableException(`Invalid user id (${id})`)
     }
 
@@ -141,14 +142,25 @@ export class UserService{
     const user = await this.findOne(id)
     if (!user){
       await deleteFile(updateUserDto.image);
+      await deleteFile(updateUserDto.identity_proof);
       throw new NotAcceptableException(`Unknown user id (${id})`)
     }
 
     // CHeck if the email already exists.
     if (email){
-      if (await this.userModel.findOne({ email,  id: { $ne: id}  })){
+      if (await this.userRepository.documentExist({ email,  _id: { $ne: id}  })){
         await deleteFile(updateUserDto.image);
+        await deleteFile(updateUserDto.identity_proof);
         throw new ConflictException(`Email exist`)
+      }
+    }
+
+    // CHeck if the username already exists.
+    if (username){
+      if (await this.userRepository.documentExist({ username,  _id: { $ne: id}  })){
+        await deleteFile(updateUserDto.image);
+        await deleteFile(updateUserDto.identity_proof);
+        throw new ConflictException(`Username exist`)
       }
     }
 
@@ -158,6 +170,13 @@ export class UserService{
       await deleteFile(user.image);
     }else {
       updateUserDto.image = user.image;
+    }
+
+    if (updateUserDto.identity_proof){
+      // Delete image
+      await deleteFile(user.identity_proof);
+    }else {
+      updateUserDto.identity_proof = user.identity_proof;
     }
 
     return this.userRepository.findOneAndUpdate({_id: id}, updateUserDto);

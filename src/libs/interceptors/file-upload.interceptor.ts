@@ -10,8 +10,13 @@ const maxFileSize = 100000000; // 100MB in bytes
 
 @Injectable()
 export class FileUploadInterceptor implements NestInterceptor {
+  private readonly fieldName: string
+  constructor(fieldName: string) {
+    this.fieldName = fieldName
+  }
+
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    FileInterceptor('file',  {
+    FileInterceptor(this.fieldName,  {
       fileFilter: (req, file, callback) => {
         const ext = extname(file.originalname).toLowerCase();
         if (allowedFileTypes.includes(ext)) {

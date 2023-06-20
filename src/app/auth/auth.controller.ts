@@ -29,6 +29,10 @@ import { UpdateUserDto } from "@app/user/dto/update-user.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { extname } from "path";
+import { FileUploadInterceptor } from "@libs/interceptors/file-upload.interceptor";
+
+const allowedFileTypes = ['.jpeg', '.jpg', '.png', '.gif', '.pdf', '.docx', '.doc', '.mp3', '.wav', '.mp4'];
+const maxFileSize = 100000000; // 100MB in bytes
 
 @Controller()
 export class AuthController extends ResponseController{
@@ -48,7 +52,6 @@ export class AuthController extends ResponseController{
     delete response_data.emailVerificationToken;
     return this.responseWithData(response_data);
   }
-
 
   @Guest()
   @Post('sign-in')
@@ -85,7 +88,15 @@ export class AuthController extends ResponseController{
   @HttpCode(HttpStatus.OK)
   async verifyToken(@Body() verifyTokenDto: VerifyTokenDto): Promise<IResponseWithData> {
     const response_data = await this.authService.verifyToken(verifyTokenDto.token);
-    return this.responseWithData( response_data);
+    const { user, access_token, refresh_token } = response_data;
+    return this.responseWithData({
+      "access-token": access_token,
+      "refresh-token": refresh_token,
+      "type": "Bearer",
+      "access-token-life-span": this.configService.get<string>('JWT_AUTH_TOKEN_EXPIRATION'),
+      "refresh-token-life-span": this.configService.get<string>('JWT_REFRESH_TOKEN_EXPIRATION'),
+      user: user
+    });
   }
 
   @Guest()
@@ -138,7 +149,10 @@ export class AuthController extends ResponseController{
   @Post('update-my-profile')
   @HttpCode(HttpStatus.ACCEPTED)
   @UseInterceptors(
-    FileInterceptor('image',  {
+    FileInterceptor('image', {
+      limits: {
+        fileSize: maxFileSize
+      },
       storage: diskStorage({
         destination: './uploads/images',
         filename: (req, file, callback) => {
@@ -149,23 +163,63 @@ export class AuthController extends ResponseController{
           callback(null, filename);
         },
       }),
-    })
-  )
-  async updateMyProfile(@Body() updateUserDto: UpdateUserDto, @CurrentUser() user: TJwtPayload,  @UploadedFile(
-    new ParseFilePipe({
-      validators: [
-        new MaxFileSizeValidator({ maxSize: 100000 }),
-        new FileTypeValidator({ fileType: 'image/jpeg' }),
-      ],
-      fileIsRequired: false
     }),
-  ) file: Express.Multer.File): Promise<IResponseWithData> {
+  )
+  async updateMyProfile(@Body() updateUserDto: UpdateUserDto, @GetCurrentUserId() userId: string,
+                        @UploadedFile(
+                          new ParseFilePipe({
+                            validators: [
+                              new MaxFileSizeValidator({ maxSize: maxFileSize }),
+                              new FileTypeValidator({ fileType: 'image/jpeg' }),
+                            ],
+                            fileIsRequired: false,
+                          }),
+                        ) file: Express.Multer.File,
+  ): Promise<IResponseWithData> {
     updateUserDto.image =  file? file.path:null;
-    const response_data = await this.authService.updateMyProfile(updateUserDto, user.userId);
+
+    const response_data = await this.authService.updateMyProfile(updateUserDto, userId);
     return this.responseWithData(response_data);
   }
 
 
+  @Post('update-my-profile-with-identity-proof')
+  @HttpCode(HttpStatus.ACCEPTED)
+  @UseInterceptors(
+    FileInterceptor('identity_proof', {
+      fileFilter: (req, file, callback) => {
+        const ext = extname(file.originalname).toLowerCase();
+        if (allowedFileTypes.includes(ext)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Invalid file type.'), false);
+        }
+      },
+      limits: {
+        fileSize: maxFileSize
+      },
+      storage: diskStorage({
+        destination: './uploads/identities',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `${uniqueSuffix}${ext}`;
+          callback(null, filename);
+        },
+      }),
+    }),
+  )
+  async updateMyIdentityProof(@Body() updateUserDto: UpdateUserDto, @GetCurrentUserId() userId: string,
+                              @UploadedFile(
+                                new ParseFilePipe({
+                                  fileIsRequired: false
+                                }),
+                              ) file: Express.Multer.File): Promise<IResponseWithData> {
+    updateUserDto.identity_proof =  file? file.path:null;
+    const response_data = await this.authService.updateMyProfile(updateUserDto, userId);
+    return this.responseWithData(response_data);
+  }
 
   @Delete('delete-my-profile')
   @HttpCode(HttpStatus.ACCEPTED)

@@ -1,21 +1,16 @@
-import { ConflictException, Injectable } from "@nestjs/common";
+import { ConflictException, Injectable, NotAcceptableException, NotFoundException } from "@nestjs/common";
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { EventRepository } from "@app/event/event.repository";
 import { Event } from "@app/event/entities/event.entity";
 import { Request } from "express";
+import mongoose from "mongoose";
 
 @Injectable()
 export class EventService {
   constructor(private readonly eventRepo: EventRepository,) {}
 
   async create(createEventDto: CreateEventDto, userId: string): Promise<Event>{
-    const { title, date } = createEventDto;
-    // Check if the event exists
-    const existingEvent = await this.eventRepo.documentExist({ title, date, user_id: userId })
-    if (existingEvent)
-      throw new ConflictException('Event already exist in your calender');
-
     return this.eventRepo.create({
       ...createEventDto,
       user_id: userId
@@ -31,22 +26,28 @@ export class EventService {
   }
 
   async update(id: string, userId: string, updateEventDto: UpdateEventDto): Promise<Event> {
-    const { title, date } = updateEventDto;
-
-    // Check if the event exists
-    const existingEvent = await this.eventRepo.documentExist({ title, date, user_id: userId, _id: { $ne: id}})
-    if (existingEvent)
-      throw new ConflictException('Another Event of this title and date already exist in your calender');
+    const existingEvent = await this.eventRepo.documentExist({ _id: id, user_id: userId })
+    if (!existingEvent)
+      throw new NotFoundException('Event does not exist on user\'s calender');
 
     // update the event record
-    return this.eventRepo.findOneAndUpdate({ _id: id }, updateEventDto);
+    return this.eventRepo.findOneAndUpdate({ _id: id, user_id: userId }, updateEventDto);
   }
 
   async remove(id: string, userId: string): Promise<Boolean> {
+    // check if the id is valid
+    if (!mongoose.isValidObjectId(id)){
+      throw new NotAcceptableException(`Invalid Event id: ${id}`)
+    }
+
+    if (!mongoose.isValidObjectId(userId)){
+      throw new NotAcceptableException(`Invalid User id: ${userId}`)
+    }
+
     // Check if the event exists
     const existingEvent = await this.eventRepo.documentExist({ _id: id, user_id: userId })
-    if (existingEvent)
-      throw new ConflictException('Event does not exist on user\'s calender');
+    if (!existingEvent)
+      throw new NotFoundException('Event does not exist on user\'s calender');
 
     // Delete the event
     await this.eventRepo.findAndDelete({ _id: id, user_id: userId });

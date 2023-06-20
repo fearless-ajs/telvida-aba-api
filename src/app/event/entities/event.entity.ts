@@ -15,10 +15,37 @@ export class Event extends AbstractDocument{
   title: string;
 
   @Prop({
+    required: false
+  })
+  description: string;
+
+  @Prop({
     type: Date,
     required: true,
   })
   date: string;
+
+  @Prop({
+    required: false
+  })
+  location?: string;
+
+  @Prop({
+    required: false
+  })
+  country?: string
+
+  @Prop({
+    required: false
+  })
+  state?: string
+
+  @Prop({
+    required: false
+  })
+  zone?: string
+
+
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);

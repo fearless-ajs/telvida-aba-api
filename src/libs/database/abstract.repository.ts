@@ -14,7 +14,7 @@ import APIFeatures from "@libs/helpers/api_features";
 export abstract class AbstractRepository<TDocument extends AbstractDocument> {
   protected abstract readonly logger: Logger;
 
-  constructor(
+  protected constructor(
     protected readonly model: Model<TDocument>,
     private readonly connection: Connection,
   ) {}

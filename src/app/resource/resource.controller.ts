@@ -19,11 +19,12 @@ import ResponseController, {
   IResponseWithMessage
 } from "@libs/helpers/response-controller";
 import { GetCurrentUserId } from "@libs/decorators";
-import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { extname } from "path";
 import { Request } from "express";
 import { ApiConsumes, ApiTags } from "@nestjs/swagger";
+import { FileUploadInterceptor } from "@libs/interceptors/file-upload.interceptor";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 const allowedFileTypes = ['.jpeg', '.jpg', '.png', '.gif', '.pdf', '.docx', '.doc', '.mp3', '.wav', '.mp4'];
 const maxFileSize = 100000000; // 100MB in bytes
@@ -37,7 +38,7 @@ export class ResourceController extends ResponseController{
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(FileInterceptor)
+  @UseInterceptors(new FileUploadInterceptor('file'))
   @ApiTags('resource')
   @ApiConsumes('multipart/form-data')
   async create(@Body() createResourceDto: CreateResourceDto, @GetCurrentUserId() userId: string, @UploadedFile(

@@ -27,12 +27,25 @@ export class User  extends AbstractDocument{
     })
     location?: string;
 
-
     @Prop({
         required: false
     })
     role?: string
 
+    @Prop({
+        required: false
+    })
+    country?: string
+
+    @Prop({
+        required: false
+    })
+    state?: string
+
+    @Prop({
+        required: false
+    })
+    zone?: string
 
     @Prop({
         required: false

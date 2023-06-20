@@ -54,7 +54,7 @@ export class AuthService {
       email: email,
     };
 
-    const [at, rt] = await Promise.all([
+    const [access_token, refresh_token] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {
         secret: this.configService.get<string>('JWT_SECRET'),
         expiresIn: `${this.configService.get('JWT_AUTH_TOKEN_EXPIRATION')}`,
@@ -66,8 +66,8 @@ export class AuthService {
     ]);
 
     return {
-      access_token: at,
-      refresh_token: rt,
+      access_token,
+      refresh_token,
     };
   }
 
@@ -173,7 +173,7 @@ export class AuthService {
   }
 
 
-  async verifyToken(token: string): Promise<User> {
+  async verifyToken(token: string): Promise<TTokens> {
     // Verify the token supplied
     const user = await this.userService.checkUserVerificationToken(token);
 
@@ -191,7 +191,16 @@ export class AuthService {
 
     // Send verification email to user
     await this.authEmailService.sendAccountVerificationMessage(user_details);
-    return user_details
+
+    const tokens = await this.getTokens(user._id.toString(), user.email);
+
+    const new_user = await this.updateRefreshTokenHash(user._id.toString(), tokens.refresh_token);
+
+    return {
+      ...tokens,
+      user: new_user
+    };
+
   }
 
   async logout(user: User) {
