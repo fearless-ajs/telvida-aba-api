@@ -1,13 +1,18 @@
 import { IsDateString, IsLatLong, IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
 
 export class CreateEventDto {
-  @IsNotEmpty() @IsString() @MaxLength(100)
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(100)
   title: string
 
-  @IsNotEmpty() @IsString() @MaxLength(4000)
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(4000)
   description: string
 
-  @IsNotEmpty() @IsDateString()
+  @IsNotEmpty()
+  @IsDateString()
   date: string;
 
   @IsOptional()

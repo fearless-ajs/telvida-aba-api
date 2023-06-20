@@ -8,7 +8,7 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
-  UseInterceptors, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Req
+  UseInterceptors, UploadedFile, ParseFilePipe, Req, UnprocessableEntityException
 } from "@nestjs/common";
 import { ResourceService } from './resource.service';
 import { CreateResourceDto } from './dto/create-resource.dto';
@@ -25,6 +25,7 @@ import { Request } from "express";
 import { ApiConsumes, ApiTags } from "@nestjs/swagger";
 import { FileUploadInterceptor } from "@libs/interceptors/file-upload.interceptor";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { UpdateUserDto } from "@app/user/dto/update-user.dto";
 
 const allowedFileTypes = ['.jpeg', '.jpg', '.png', '.gif', '.pdf', '.docx', '.doc', '.mp3', '.wav', '.mp4'];
 const maxFileSize = 100000000; // 100MB in bytes
@@ -37,37 +38,9 @@ export class ResourceController extends ResponseController{
   }
 
   @Post()
-  @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(new FileUploadInterceptor('file'))
-  @ApiTags('resource')
-  @ApiConsumes('multipart/form-data')
-  async create(@Body() createResourceDto: CreateResourceDto, @GetCurrentUserId() userId: string, @UploadedFile(
-    new ParseFilePipe({
-      fileIsRequired: true
-    }),
-  ) file: Express.Multer.File): Promise<IResponseWithData> {
-    const response_data = await this.resourceService.create(createResourceDto, userId);
-    return this.responseWithData(response_data);
-  }
-
-  @Get()
-  @HttpCode(HttpStatus.OK)
-  async findAll(@Req() req: Request): Promise<IResponseWithDataCollection> {
-    const response_data = await this.resourceService.findAll(req);
-    return this.responseWithDataCollection(response_data);
-  }
-
-  @Get(':id')
-  @HttpCode(HttpStatus.OK)
-  async findOne(@Param('id') id: string): Promise<IResponseWithData>  {
-    const response_data = await this.resourceService.findOne(id);
-    return this.responseWithData(response_data);
-  }
-
-  @Patch(':id')
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.ACCEPTED)
   @UseInterceptors(
-    FileInterceptor('file',  {
+    FileInterceptor('resource_file', {
       fileFilter: (req, file, callback) => {
         const ext = extname(file.originalname).toLowerCase();
         if (allowedFileTypes.includes(ext)) {
@@ -89,9 +62,67 @@ export class ResourceController extends ResponseController{
           callback(null, filename);
         },
       }),
-    })
+    }),
   )
-  async update(@Param('id') id: string, @GetCurrentUserId() userId: string, @Body() updateResourceDto: UpdateResourceDto): Promise<IResponseWithData>  {
+  async create(@Body() createResourceDto: CreateResourceDto, @GetCurrentUserId() userId: string,
+                              @UploadedFile(
+                                new ParseFilePipe({
+                                  fileIsRequired: true
+                                }),
+                              ) file: Express.Multer.File): Promise<IResponseWithData> {
+    createResourceDto.resource_file =  file? file.path:null;
+    const response_data = await this.resourceService.create(createResourceDto, userId);
+    return this.responseWithData(response_data);
+  }
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async findAll(@Req() req: Request): Promise<IResponseWithDataCollection> {
+    const response_data = await this.resourceService.findAll(req);
+    return this.responseWithDataCollection(response_data);
+  }
+
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  async findOne(@Param('id') id: string): Promise<IResponseWithData>  {
+    const response_data = await this.resourceService.findOne(id);
+    return this.responseWithData(response_data);
+  }
+
+  @Patch(':id')
+  @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(
+    FileInterceptor('resource_file', {
+      fileFilter: (req, file, callback) => {
+        const ext = extname(file.originalname).toLowerCase();
+        if (allowedFileTypes.includes(ext)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Invalid file type.'), false);
+        }
+      },
+      limits: {
+        fileSize: maxFileSize
+      },
+      storage: diskStorage({
+        destination: './uploads/resources',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `${uniqueSuffix}${ext}`;
+          callback(null, filename);
+        },
+      }),
+    }),
+  )
+  async update(@Param('id') id: string, @GetCurrentUserId() userId: string, @Body() updateResourceDto: UpdateResourceDto,
+               @UploadedFile(
+                new ParseFilePipe({
+                  fileIsRequired: false
+                }),
+  ) file: Express.Multer.File): Promise<IResponseWithData> {
+    updateResourceDto.resource_file =  file? file.path:null;
     const response_data = await this.resourceService.update(id,userId, updateResourceDto);
     return this.responseWithData(response_data);
   }

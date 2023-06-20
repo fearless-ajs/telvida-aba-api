@@ -16,9 +16,33 @@ export class Resource extends AbstractDocument {
   name?: string;
 
   @Prop({
-    type: String,
+    required: false
+  })
+  description: string;
+
+  @Prop({
     required: true,
   })
-  file: string;
+  resource_file: string;
+
+  @Prop({
+    required: false
+  })
+  location?: string;
+
+  @Prop({
+    required: false
+  })
+  country?: string
+
+  @Prop({
+    required: false
+  })
+  state?: string
+
+  @Prop({
+    required: false
+  })
+  zone?: string
 }
 export const ResourceSchema = SchemaFactory.createForClass(Resource);

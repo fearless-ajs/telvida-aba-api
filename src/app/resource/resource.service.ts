@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotAcceptableException, NotFoundException } from "@nestjs/common";
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
 import { Resource } from "@app/resource/entities/resource.entity";
 import { ResourceRepository } from "@app/resource/resource.repository";
 import { Request } from "express";
 import { deleteFile } from "@libs/helpers/file-processor";
+import mongoose from "mongoose";
 
 @Injectable()
 export class ResourceService {
@@ -26,26 +27,46 @@ export class ResourceService {
   }
 
   async update(id: string, userId: string, updateResourceDto: UpdateResourceDto) {
-    const { file } = updateResourceDto;
+    const { resource_file } = updateResourceDto;
+
+    // check if the resource id is valid
+    if (!mongoose.isValidObjectId(id)){
+      throw new NotAcceptableException(`Invalid Resource id: ${id}`)
+    }
+
+    // check if the user id is valid
+    if (!mongoose.isValidObjectId(userId)){
+      throw new NotAcceptableException(`Invalid User id: ${id}`)
+    }
 
     // Check if the resource exist fot the user
     const resource = await this.resourceRepo.documentExist({ _id: id, user_id: userId });
     if (!resource){
-      await deleteFile(file);
+      await deleteFile(resource_file);
       throw new NotFoundException(`Resource with the id ${id} does not exist for the user`)
     }
 
-    if (file){
+    if (resource_file){
       // Delete the file
-      await deleteFile(resource.file);
+      await deleteFile(resource.resource_file);
     }else {
-      updateResourceDto.file = resource.file;
+      updateResourceDto.resource_file = resource.resource_file;
     }
 
     return this.resourceRepo.findOneAndUpdate({ _id: id, user_id: userId }, updateResourceDto);
   }
 
   async remove(id: string, userId: string): Promise<boolean> {
+    // check if the resource id is valid
+    if (!mongoose.isValidObjectId(id)){
+      throw new NotAcceptableException(`Invalid Resource id: ${id}`)
+    }
+
+    // check if the user id is valid
+    if (!mongoose.isValidObjectId(userId)){
+      throw new NotAcceptableException(`Invalid User id: ${id}`)
+    }
+
     // Check if the resource exist fot the user
     const resource = await this.resourceRepo.documentExist({ _id: id, user_id: userId });
     if (!resource){
@@ -53,7 +74,7 @@ export class ResourceService {
     }
 
     // Delete the file
-    await deleteFile(resource.file);
+    await deleteFile(resource.resource_file);
 
     // Delete the record from database
     await this.resourceRepo.findAndDelete({ _id: id, user_id: userId });
