@@ -8,7 +8,7 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
-  UseInterceptors, UploadedFile, ParseFilePipe, Req, UnprocessableEntityException
+  UseInterceptors, UploadedFile, ParseFilePipe, Req, UnprocessableEntityException, Query
 } from "@nestjs/common";
 import { ResourceService } from './resource.service';
 import { CreateResourceDto } from './dto/create-resource.dto';
@@ -26,6 +26,7 @@ import { ApiConsumes, ApiTags } from "@nestjs/swagger";
 import { FileUploadInterceptor } from "@libs/interceptors/file-upload.interceptor";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { UpdateUserDto } from "@app/user/dto/update-user.dto";
+import { TQuery } from "@libs/database/abstract.repository";
 
 const allowedFileTypes = ['.jpeg', '.jpg', '.png', '.gif', '.pdf', '.docx', '.doc', '.mp3', '.wav', '.mp4'];
 const maxFileSize = 100000000; // 100MB in bytes
@@ -77,9 +78,11 @@ export class ResourceController extends ResponseController{
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async findAll(@Req() req: Request): Promise<IResponseWithDataCollection> {
+  async findAll(@Req() req: Request) {
     const response_data = await this.resourceService.findAll(req);
-    return this.responseWithDataCollection(response_data);
+    const {length, data} = response_data;
+
+    return this.responseWithCollection(data, length);
   }
 
   @Get(':id')

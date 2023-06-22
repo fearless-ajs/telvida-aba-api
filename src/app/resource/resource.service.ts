@@ -1,4 +1,4 @@
-import { Injectable, NotAcceptableException, NotFoundException } from "@nestjs/common";
+import { Injectable, NotAcceptableException, NotFoundException, Query, Req } from "@nestjs/common";
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
 import { Resource } from "@app/resource/entities/resource.entity";
@@ -6,6 +6,7 @@ import { ResourceRepository } from "@app/resource/resource.repository";
 import { Request } from "express";
 import { deleteFile } from "@libs/helpers/file-processor";
 import mongoose from "mongoose";
+import { IFilterableCollection } from "@libs/helpers/response-controller";
 
 @Injectable()
 export class ResourceService {
@@ -18,8 +19,10 @@ export class ResourceService {
     })
   }
 
-  async findAll(req: Request): Promise<Resource[]> {
-    return this.resourceRepo.findAll(req);
+  async findAll(
+    @Req() req: Request
+  ): Promise<IFilterableCollection> {
+    return this.resourceRepo.findAllFiltered(req);
   }
 
   async findOne(id: string): Promise<Resource> {

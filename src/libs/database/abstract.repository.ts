@@ -1,15 +1,26 @@
-import {HttpException, HttpStatus, Logger, NotAcceptableException, NotFoundException} from '@nestjs/common';
-import mongoose, {
-  FilterQuery,
-  Model,
-  Types,
-  UpdateQuery,
-  SaveOptions,
-  Connection,
-} from 'mongoose';
-import { AbstractDocument } from './abstract.entity';
-import {Request} from "express";
+import {
+  HttpException,
+  HttpStatus,
+  Logger,
+  NotAcceptableException,
+  NotFoundException,
+  Query,
+  Req
+} from "@nestjs/common";
+import mongoose, { Connection, FilterQuery, Model, SaveOptions, Types, UpdateQuery } from "mongoose";
+import { AbstractDocument } from "./abstract.entity";
+import { Request } from "express";
 import APIFeatures from "@libs/helpers/api_features";
+import { appInfo } from "@config/config";
+import { IFilterableCollection } from "@libs/helpers/response-controller";
+
+export type TQuery = {
+  page: number,
+  perPage: number,
+  sortBy: string,
+  sortOrder: 'asc' | 'desc',
+  filter?:any,
+}
 
 export abstract class AbstractRepository<TDocument extends AbstractDocument> {
   protected abstract readonly logger: Logger;
@@ -121,6 +132,86 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     return this.model.find(filterQuery, {}, { lean: true });
   }
 
+  async findAllFiltered(@Req() request: Request): Promise<IFilterableCollection> {
+    const {
+      page = 1,
+      perPage = 15,
+      sortBy,
+      sortOrder = 'asc',
+      filter,
+    }  = request.query as unknown as TQuery;
+
+
+    const startIndex = (page - 1) * perPage;
+    const endIndex = page * perPage;
+
+    // Create a query object to build the MongoDB query
+    const queryObject = {};
+
+    // Apply the filter if it is provided
+    if (filter) {
+      // Assuming `filter` is an object containing the filter criteria
+      Object.assign(queryObject, filter);
+    }
+
+    // Create a sort object based on sortBy and sortOrder
+    const sortObject = {};
+    if (sortBy) {
+      sortObject[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    }
+
+    // Perform the database query with the filter, sort, skip, and limit
+    const [collection, total] = await Promise.all([
+      this.model
+        .find(queryObject)
+        .sort(sortObject)
+        .skip(startIndex)
+        .limit(perPage)
+        .exec(),
+      this.model.countDocuments(queryObject).exec(),
+    ]);
+
+    const currentPage = page;
+    const lastPage = Math.ceil(total / perPage);
+    const baseUrl = request.originalUrl; // Retrieve the base URL dynamically from the request object
+
+    const firstPageUrl = `${baseUrl}?page=1`;
+    const lastPageUrl = `${baseUrl}?page=${lastPage}`;
+
+    // Construct the dynamic pagination links
+    const links = [];
+    if (currentPage > 1) {
+      links.push({ url: `${baseUrl}?page=${currentPage - 1}`, label: '&laquo; Previous', active: false });
+    }
+    for (let i = 1; i <= lastPage; i++) {
+      const isActive = i === currentPage;
+      links.push({ url: `${baseUrl}?page=${i}`, label: i.toString(), active: isActive });
+    }
+    if (currentPage < lastPage) {
+      links.push({ url: `${baseUrl}?page=${currentPage + 1}`, label: 'Next &raquo;', active: false });
+    }
+
+    const data = {
+      current_page: currentPage,
+      data: collection,
+      first_page_url: firstPageUrl,
+      from: startIndex + 1,
+      last_page: lastPage,
+      last_page_url: lastPageUrl,
+      links: links,
+      next_page_url: currentPage < lastPage ? `${baseUrl}?page=${currentPage + 1}` : null,
+      path: baseUrl, // Use the full request URL as the path
+      per_page: perPage,
+      prev_page_url: currentPage > 1 ? `${baseUrl}?page=${currentPage - 1}` : null,
+      to: endIndex,
+      total: total,
+    };
+
+    return {
+      length: collection.length,
+      data: data,
+    };
+  }
 
   findAll  = async (req:Request, filter?:any)   => {
 

@@ -17,6 +17,11 @@ export interface IResponseWithDataCollection {
     data: any[]
 }
 
+export interface IFilterableCollection {
+    length: number
+    data: any,
+}
+
 class ResponseController {
 
     public sendRPCResponseMessage(message: any, status): IResponseWithMessage{
@@ -54,12 +59,22 @@ class ResponseController {
         }
     }
 
-    public responseWithDataCollection(data: any[]): IResponseWithDataCollection {
-       return {
-           status: 'SUCCESS',
-           results: data.length,
-           data
-       }
+    public responseWithDataCollection(response_data: IFilterableCollection): IResponseWithDataCollection {
+        const { length, data } = response_data;
+        return {
+            status: 'SUCCESS',
+            results: length,
+            data: data,
+        }
+    }
+
+
+    public responseWithCollection(data: any[], collection_length : number): IResponseWithDataCollection {
+        return {
+            status: 'SUCCESS',
+            results: collection_length,
+            data: data,
+        }
     }
 
 }

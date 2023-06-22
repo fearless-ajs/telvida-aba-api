@@ -6,6 +6,7 @@ import { Request } from "express";
 import { AccessToken } from "./entities/access-token.entity";
 import AccountHelper from "@libs/helpers/account-helper";
 import { AccessTokenRepository } from "@app/access-control/access-token/access-token.repository";
+import { IFilterableCollection } from "@libs/helpers/response-controller";
 
 @Injectable()
 export class AccessTokenService{
@@ -35,8 +36,8 @@ export class AccessTokenService{
     });
   }
 
-  async findAll(req: Request): Promise<AccessToken[]> {
-    return this.accessTokenRepository.findAll(req);
+  async findAll(req: Request): Promise<IFilterableCollection> {
+    return this.accessTokenRepository.findAllFiltered(req);
   }
 
   async findOne(id: string): Promise<AccessToken> {

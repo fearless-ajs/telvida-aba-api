@@ -5,6 +5,7 @@ import { EventRepository } from "@app/event/event.repository";
 import { Event } from "@app/event/entities/event.entity";
 import { Request } from "express";
 import mongoose from "mongoose";
+import { IFilterableCollection } from "@libs/helpers/response-controller";
 
 @Injectable()
 export class EventService {
@@ -17,8 +18,8 @@ export class EventService {
     })
   }
 
-  async findAll(req: Request): Promise<Event[]> {
-    return this.eventRepo.findAll(req);
+  async findAll(req: Request): Promise<IFilterableCollection> {
+    return this.eventRepo.findAllFiltered(req);
   }
 
   async findOne(id: string): Promise<Event> {

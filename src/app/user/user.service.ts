@@ -16,6 +16,7 @@ import {User, UserDocument} from "./entities/user.entity";
 import { deleteFile } from "@libs/helpers/file-processor";
 import {ConfigService} from "@nestjs/config";
 import { AuthEmailService } from "@libs/mail/auth-email/auth-email.service";
+import { IFilterableCollection } from "@libs/helpers/response-controller";
 
 @Injectable()
 export class UserService{
@@ -54,8 +55,8 @@ export class UserService{
    return user
   }
 
-  async findAll(req: Request): Promise<User[]> {
-    return this.userRepository.findAll(req);
+  async findAll(req: Request): Promise<IFilterableCollection> {
+    return this.userRepository.findAllFiltered(req);
   }
 
   async findOne(id: string): Promise<User> {
