@@ -1,0 +1,29 @@
+extends ../baseEmail
+
+block content
+  p Hi Admin,
+  p We would like to inform you that a user has updated the status of their support request. Please find the updated details below:
+
+  p
+   b User Details: <br>
+  ul
+    li Name: #{payload.user.firstname} #{payload.user.lastname}
+    li Email: #{payload.user.email}
+    li Ticket reference Number: #{payload.support.reference_id}
+
+  p
+   b Support Request Details:
+  ul
+    li Date and Time: #{payload.support.createdAt}
+    li Request Description: #{payload.support.description}
+    li Status: #{payload.support.status.toUpperCase()}
+
+  p Please review the updated status and take necessary actions accordingly. It's important to ensure that the user's support needs are addressed promptly and efficiently.
+
+  p If you require any further clarification or additional information from the user, please reach out to them directly at the provided email address.
+
+  p Thank you for your attention to this matter. We greatly appreciate your efforts in delivering exceptional support to our valued users.
+
+  br
+  small
+    b - #{payload.appInfo.email}, #{payload.appInfo.name}

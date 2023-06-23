@@ -1,0 +1,15 @@
+extends ../baseEmail
+
+block content
+  p Hi #{payload.user.firstname},
+  p Thank you for reaching out to us for support. We have received your request and our team is working diligently to assist you. Your ticket reference number is #{payload.support.reference_id}.
+
+  p We understand that your inquiry is important, and we strive to provide timely and efficient support. Our team will review your request and respond as soon as possible. Please note that our working hours are [Working Hours], and we aim to reply within 24hrs
+  p If you have any additional information or screenshots related to your issue, please feel free to attach them to your reply. This will help us better understand and resolve the problem.
+
+  p We appreciate your patience and understanding. Rest assured, we are committed to providing you with the best possible support experience.
+  hr
+  small Thank you again for choosing #{payload.appInfo.name}. We look forward to resolving your issue promptly.
+  br
+  small
+    b - #{payload.appInfo.email}, #{payload.appInfo.name}

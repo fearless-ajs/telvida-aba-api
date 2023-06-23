@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import {ConfigModule} from "@nestjs/config";
 import * as Joi from "joi";
 import {UserModule} from "@app/user/user.module";
@@ -15,11 +15,18 @@ import { AccessToken, AccessTokenSchema } from "@app/access-control/access-token
 import { MulterModule } from "@nestjs/platform-express";
 import { EventModule } from "@app/event/event.module";
 import { ResourceModule } from "@app/resource/resource.module";
+import { SupportModule } from "@app/support/support.module";
+import { EventEmitterModule } from "@nestjs/event-emitter";
+import { ScheduleModule } from "@nestjs/schedule";
+import { EventsListenerModule } from "@libs/listeners/events-listener/events-listener.module";
+
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: AccessToken.name, schema: AccessTokenSchema }
     ]),
+    EventEmitterModule.forRoot(),
+    ScheduleModule.forRoot(),
     DatabaseModule,
     RmqModule,
     ConfigModule.forRoot({
@@ -42,6 +49,8 @@ import { ResourceModule } from "@app/resource/resource.module";
     UserModule,
     EventModule,
     ResourceModule,
+    SupportModule,
+    EventsListenerModule,
   ],
   providers: [
     AccessTokenRepository,

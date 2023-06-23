@@ -39,7 +39,7 @@ export class ResourceController extends ResponseController{
   }
 
   @Post()
-  @HttpCode(HttpStatus.ACCEPTED)
+  @HttpCode(HttpStatus.CREATED)
   @UseInterceptors(
     FileInterceptor('resource_file', {
       fileFilter: (req, file, callback) => {
@@ -93,7 +93,7 @@ export class ResourceController extends ResponseController{
   }
 
   @Patch(':id')
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.ACCEPTED)
   @UseInterceptors(
     FileInterceptor('resource_file', {
       fileFilter: (req, file, callback) => {

@@ -1,0 +1,22 @@
+extends ../baseEmail
+
+block content
+  p Hi #{payload.user.firstname} #{payload.user.lastname},
+  p We are writing to inform you that the status of your support request has been successfully updated. Please find the details below:
+
+  p
+   b Support Request Details:
+  ul
+    li Ticket reference Number: #{payload.support.reference_id}
+    li Status: #{payload.support.status.toUpperCase()}
+
+
+  p We have noted your request and have made the necessary updates in our system. Our team is working diligently to address your support needs based on the updated status.
+
+  p If you have any further questions or require additional assistance, please do not hesitate to reach out to us at #{payload.appInfo.email}. We are here to provide you with the best possible support experience.
+
+  p Thank you for your attention to this matter. We greatly appreciate your efforts in delivering exceptional support to our valued users.
+
+  br
+  small
+    b - #{payload.appInfo.email}, #{payload.appInfo.name}

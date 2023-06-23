@@ -4,7 +4,9 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "deleteOutDir": true,
-    "assets": ["libs/mail/email-engine/templates/**"],
+    "assets": [
+      "libs/mail/email-engine/templates/**"
+    ],
     "watchAssets": true
   }
 }

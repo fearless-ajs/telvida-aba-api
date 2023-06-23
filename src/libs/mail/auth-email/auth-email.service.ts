@@ -6,7 +6,7 @@ import { appInfo } from "@config/config";
 @Injectable()
 export class AuthEmailService {
 
-  constructor( private readonly emailEngineService: EmailEngineService ) {}
+  constructor(private readonly emailEngineService: EmailEngineService ) {}
 
   async sendWelcomeMessage(user: User){
     const { email, emailVerificationToken,  } = user;

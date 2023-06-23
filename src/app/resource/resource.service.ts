@@ -19,9 +19,7 @@ export class ResourceService {
     })
   }
 
-  async findAll(
-    @Req() req: Request
-  ): Promise<IFilterableCollection> {
+  async findAll(@Req() req: Request): Promise<IFilterableCollection> {
     return this.resourceRepo.findAllFiltered(req);
   }
 
