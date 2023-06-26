@@ -10,9 +10,12 @@ import { ResetPasswordTokenDto } from "./dto/reset-password-token.dto";
 import { TJwtPayload, TTokens } from "@libs/types/auth";
 import * as argon from "argon2";
 import { SignInDto } from "@app/auth/dto/sign-in.dto";
-import { AuthEmailService } from "@libs/mail/auth-email/auth-email.service";
-import { string } from "joi";
 import { UpdateUserDto } from "@app/user/dto/update-user.dto";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { events } from "@config/constants";
+import { UserEvent } from "@app/user/events/user.event";
+import { ForgotPasswordEvent } from "@app/auth/events/forgot-password.event";
+import { UserLoggedInEvent } from "@app/auth/events/user-logged-in.event";
 
 export interface TokenPayload {
   userId: string;
@@ -24,7 +27,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly authEmailService: AuthEmailService
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async login(signInDto: SignInDto):  Promise<TTokens> {
@@ -34,6 +37,9 @@ export class AuthService {
     const tokens = await this.getTokens(user._id.toString(), user.email);
 
     const new_user = await this.updateRefreshTokenHash(user._id.toString(), tokens.refresh_token);
+
+    // Dispatch user logged in event
+    this.eventEmitter.emit(events.USER_LOGGED_IN, new UserLoggedInEvent(user));
 
     return {
       ...tokens,
@@ -114,8 +120,8 @@ export class AuthService {
       throw new NotAcceptableException('User verified already');
     }
 
-    // Send the token to the user email
-    await this.authEmailService.resendVerificationTokenMessage(user);
+    // Emit a resend verification token event
+    this.eventEmitter.emit(events.VERIFICATION_TOKEN_REQUEST, new UserEvent(user));
 
     return true;
   }
@@ -136,7 +142,9 @@ export class AuthService {
       passwordResetToken: code
     });
 
-    await this.authEmailService.sendForgotPasswordMessage(user, code);
+    // Emit a forgot password event
+    this.eventEmitter.emit(events.FORGOT_PASSWORD, new ForgotPasswordEvent(user, code));
+
     return true;
   }
 
@@ -155,9 +163,10 @@ export class AuthService {
       passwordChangedAt: Date.now()
     });
 
-    await this.authEmailService.sendPasswordUpdatedMessage(updated_user)
-    return true;
+    // Emit a password changed event
+    this.eventEmitter.emit(events.PASSWORD_CHANGED, new UserEvent(user));
 
+    return true;
   }
 
   async verifyResetPasswordToken(token: string): Promise<User> {
@@ -182,15 +191,15 @@ export class AuthService {
     }
 
     // @ts-ignore
-    const user_details =  await this.userService.findOneByIdAndUpdate(user._id, {
+    await this.userService.findOneByIdAndUpdate(user._id, {
       emailVerificationStatus: true,
       emailVerificationToken: null,
       emailVerifiedAt: Date.now(),
       updatedAt: Date.now()
     });
 
-    // Send verification email to user
-    await this.authEmailService.sendAccountVerificationMessage(user_details);
+    // Emit a user account verification event
+    this.eventEmitter.emit(events.ACCOUNT_VERIFIED, new UserEvent(user));
 
     const tokens = await this.getTokens(user._id.toString(), user.email);
 

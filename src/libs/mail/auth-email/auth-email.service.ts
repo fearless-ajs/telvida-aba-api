@@ -8,6 +8,24 @@ export class AuthEmailService {
 
   constructor(private readonly emailEngineService: EmailEngineService ) {}
 
+
+  async sendUserLoggedInMessage(user: User, dateTime: string){
+    const { email, emailVerificationToken,  } = user;
+    const { appName } = appInfo;
+
+    const payload = {
+      user: {
+        email: email,
+        token: emailVerificationToken
+      },
+      dateTime
+    }
+
+    const subject: string = `${appName.toUpperCase()} - SUCCESSFUL LOGIN NOTIFICATION`
+    await this.emailEngineService.sendHtmlEmail([email],  subject, `auth/user-logged-in`, payload);
+  }
+
+
   async sendWelcomeMessage(user: User){
     const { email, emailVerificationToken,  } = user;
     const { appName } = appInfo;
@@ -20,7 +38,7 @@ export class AuthEmailService {
     }
 
     const subject: string = `Welcome To ${appName}`
-    await this.emailEngineService.sendHtmlEmail([email],  subject, `welcome-with-verification-token`, payload);
+    await this.emailEngineService.sendHtmlEmail([email],  subject, `auth/welcome-with-verification-token`, payload);
   }
 
   async resendVerificationTokenMessage(user: User){
@@ -34,7 +52,7 @@ export class AuthEmailService {
     }
 
     const subject: string = ` Resending Verification Token - Complete Your Account`
-    await this.emailEngineService.sendHtmlEmail([email],  subject, `resend-verification-token`, payload);
+    await this.emailEngineService.sendHtmlEmail([email],  subject, `auth/resend-verification-token`, payload);
   }
 
   async sendAccountVerificationMessage(user: User){
@@ -48,7 +66,7 @@ export class AuthEmailService {
       }
     }
     const subject: string = `Account Verified - Welcome to ${appName}!`;
-    await this.emailEngineService.sendHtmlEmail([email],  subject, 'account-verified', payload);
+    await this.emailEngineService.sendHtmlEmail([email],  subject, 'auth/account-verified', payload);
   }
 
   async sendForgotPasswordMessage(user: User, token: number){
@@ -63,9 +81,8 @@ export class AuthEmailService {
     }
 
     const subject: string = `Password Reset Request - Reset Your ${appName} Account`;
-    await this.emailEngineService.sendHtmlEmail([email], subject, 'forgot-password', payload);
+    await this.emailEngineService.sendHtmlEmail([email], subject, 'auth/forgot-password', payload);
   }
-
 
   async sendPasswordUpdatedMessage(user: User){
     const { email } = user;
@@ -78,7 +95,7 @@ export class AuthEmailService {
     }
 
     const subject: string = ` Password Updated - ${appName} Account Security Notification`;
-    await this.emailEngineService.sendHtmlEmail([email], subject, 'password-updated', payload);
+    await this.emailEngineService.sendHtmlEmail([email], subject, 'auth/password-updated', payload);
   }
 
 

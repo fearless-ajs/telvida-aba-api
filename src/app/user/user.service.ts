@@ -17,6 +17,10 @@ import { deleteFile } from "@libs/helpers/file-processor";
 import {ConfigService} from "@nestjs/config";
 import { AuthEmailService } from "@libs/mail/auth-email/auth-email.service";
 import { IFilterableCollection } from "@libs/helpers/response-controller";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { events } from "@config/constants";
+import { SupportEvent } from "@app/support/events/support.event";
+import { UserEvent } from "@app/user/events/user.event";
 
 @Injectable()
 export class UserService{
@@ -24,7 +28,7 @@ export class UserService{
       @InjectModel(User.name) private userModel: Model<UserDocument>,
       private readonly userRepository: UserRepository,
       private readonly configService: ConfigService,
-      private readonly authEmailService: AuthEmailService
+      private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -39,20 +43,16 @@ export class UserService{
     // CHeck if the phone number already exists.
     if (await this.findOneByEmail(email)) throw new ConflictException(`Email exist`)
 
-
-
-    let now = new Date(Date.now());
-
    const user = await this.userRepository.create({
       email,
       password: hash,
       emailVerificationToken: code.toString()
     });
 
-    // Email the user concerning the update
-    await this.authEmailService.sendWelcomeMessage(user)
+    // Emit a user created Event
+    this.eventEmitter.emit(events.USER_CREATED, new UserEvent(user));
 
-   return user
+    return user
   }
 
   async findAll(req: Request): Promise<IFilterableCollection> {

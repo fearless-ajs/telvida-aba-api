@@ -12,7 +12,6 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import { events } from "@config/constants";
 import { SupportEvent } from "@app/support/events/support.event";
 import { UserService } from "@app/user/user.service";
-import { SupportEmailService } from "@libs/mail/support-email/support-email.service";
 import { UpdateSupportStatusDto } from "@app/support/dto/update-support-status.dto";
 
 @Injectable()
@@ -21,7 +20,6 @@ export class SupportService {
     private readonly supportRepo: SupportRepository,
     private readonly userService: UserService,
     private readonly eventEmitter: EventEmitter2,
-    private readonly supportEmailService: SupportEmailService
   ) {}
 
  async create(createSupportDto: CreateSupportDto, userId: string): Promise<Support> {

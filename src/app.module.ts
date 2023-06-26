@@ -19,6 +19,7 @@ import { SupportModule } from "@app/support/support.module";
 import { EventEmitterModule } from "@nestjs/event-emitter";
 import { ScheduleModule } from "@nestjs/schedule";
 import { EventsListenerModule } from "@libs/listeners/events-listener/events-listener.module";
+import { UserEmailModule } from './libs/mail/user-email/user-email.module';
 
 @Module({
   imports: [
