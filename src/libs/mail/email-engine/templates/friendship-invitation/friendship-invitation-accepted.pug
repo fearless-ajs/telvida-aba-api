@@ -1,0 +1,11 @@
+extends ../baseEmail
+
+block content
+  p Dear #{payload.sender.firstname?payload.sender.firstname:null},
+  p Great news! Your friendship invitation on #{payload.appInfo.name} has been accepted by #{payload.receiver.firstname + ' ' + payload.receiver.lastname}. Start connecting and enjoy the ABA Chat experience together!
+
+  p Thank you for being a part of the #{payload.appInfo.name} community. We hope you enjoy connecting and building new friendships on our platform.
+
+  br
+  small
+    b - #{payload.appInfo.email}, #{payload.appInfo.name}

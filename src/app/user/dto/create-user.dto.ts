@@ -32,7 +32,9 @@ export class MatchConstraint implements ValidatorConstraintInterface {
 }
 
 export class CreateUserDto {
-    @IsNotEmpty() @IsEmail()  @MaxLength(100)
+    @IsNotEmpty()
+    @IsEmail()
+    @MaxLength(100)
     @CustomValidation()
     email: string
 

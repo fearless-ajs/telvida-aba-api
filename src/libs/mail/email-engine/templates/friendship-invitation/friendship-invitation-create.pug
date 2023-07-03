@@ -1,0 +1,13 @@
+extends ../baseEmail
+
+block content
+  p Dear #{payload.receiver.firstname?payload.receiver.firstname:null},
+  p You have received a new friendship invitation on #{payload.appInfo.name}, a social networking platform that connects people from all walks of life.
+
+  p #{payload.sender.firstname + ' ' + payload.sender.lastname} has expressed interest in becoming your friend and connecting with you on #{payload.appInfo.name}. If you would like to accept this invitation, please log in to your #{payload.appInfo.name} account and navigate to the Friendship Invitations section. From there, you can accept or decline the invitation.
+
+  p Thank you for being a part of the #{payload.appInfo.name} community. We hope you enjoy connecting and building new friendships on our platform.
+
+  br
+  small
+    b - #{payload.appInfo.email}, #{payload.appInfo.name}

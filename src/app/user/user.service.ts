@@ -84,20 +84,7 @@ export class UserService{
   }
 
   async getUser(getUserArgs: Partial<User>) {
-    return this.userRepository.findOne(getUserArgs);
-  }
-
-  private async validateCreateUserRequest(request: CreateUserDto) {
-    let user: User;
-    try {
-      user = await this.userRepository.findOne({
-        email: request.email,
-      });
-    } catch (err) {}
-
-    if (user) {
-      throw new UnprocessableEntityException('Email already exists.');
-    }
+    return this.userRepository.documentExist(getUserArgs);
   }
 
   async findOneByEmail(email: string): Promise<User> {

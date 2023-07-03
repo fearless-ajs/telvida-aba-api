@@ -104,7 +104,10 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     filterQuery: FilterQuery<TDocument>,
     update: UpdateQuery<TDocument>,
   ) {
-    const document = await this.model.findOneAndUpdate(filterQuery, update, {
+    const document = await this.model.findOneAndUpdate(filterQuery, {
+      ...update,
+      updatedAt: Date.now()
+    }, {
       new: true,
       runValidators: true
     });
@@ -237,16 +240,6 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
   ) {
     return this.model.findOneAndDelete(filterQuery);
   }
-
-   isObjectIdValid(objectId: string, modelName?: string): Boolean{
-        // Check if the ID is valid
-    if (!mongoose.isValidObjectId(objectId)){
-      throw new HttpException(`Invalid ${modelName} id`, HttpStatus.NOT_ACCEPTABLE)
-    }
-
-    return true;
-  }
-
 
   async startTransaction() {
     const session = await this.connection.startSession();

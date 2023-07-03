@@ -19,7 +19,11 @@ import { SupportModule } from "@app/support/support.module";
 import { EventEmitterModule } from "@nestjs/event-emitter";
 import { ScheduleModule } from "@nestjs/schedule";
 import { EventsListenerModule } from "@libs/listeners/events-listener/events-listener.module";
-import { UserEmailModule } from './libs/mail/user-email/user-email.module';
+import { ConversationModule } from "@app/chat/conversation/conversation.module";
+import { ConversationAttachmentModule } from "@app/chat/conversation-attachment/conversation-attachment.module";
+import { FriendshipModule } from "@app/chat/friendship/friendship.module";
+import { FriendshipInvitationModule } from "@app/chat/friendship-invitation/friendship-invitation.module";
+import { FriendshipInvitationEventListenerService } from './libs/listeners/friendship-invitation-event-listener/friendship-invitation-event-listener.service';
 
 @Module({
   imports: [
@@ -52,6 +56,10 @@ import { UserEmailModule } from './libs/mail/user-email/user-email.module';
     ResourceModule,
     SupportModule,
     EventsListenerModule,
+    ConversationModule,
+    ConversationAttachmentModule,
+    FriendshipModule,
+    FriendshipInvitationModule,
   ],
   providers: [
     AccessTokenRepository,
@@ -62,7 +70,7 @@ import { UserEmailModule } from './libs/mail/user-email/user-email.module';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard
-    },
+    }
   ]
 })
 export class AppModule {}
