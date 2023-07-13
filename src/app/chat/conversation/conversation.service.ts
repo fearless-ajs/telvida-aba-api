@@ -4,6 +4,10 @@ import { UpdateConversationDto } from './dto/update-conversation.dto';
 
 @Injectable()
 export class ConversationService {
+  constructor(
+
+  ) {}
+
   create(createConversationDto: CreateConversationDto) {
     return 'This action adds a new conversation';
   }

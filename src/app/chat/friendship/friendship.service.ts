@@ -2,14 +2,10 @@ import { Injectable, NotAcceptableException, NotFoundException } from "@nestjs/c
 import { UserService } from "@app/user/user.service";
 import { FriendshipRepository } from "@app/chat/friendship/friendship.repository";
 import { Friendship } from "@app/chat/friendship/entities/friendship.entity";
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
 import { Request } from "express";
 import { IFilterableCollection } from "@libs/helpers/response-controller";
-import { FriendshipInvitationService } from "@app/chat/friendship-invitation/friendship-invitation.service";
 import { events } from "@config/constants";
-import {
-  FriendshipInvitationCreatedEvent
-} from "@app/chat/friendship-invitation/events/friendship-invitation-created.event";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { FriendshipDeletedEvent } from "@app/chat/friendship/events/friendship-deleted.event";
 

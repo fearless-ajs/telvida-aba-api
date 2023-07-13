@@ -1,8 +1,8 @@
 import {
-  ConflictException, ForbiddenException,
-  Injectable, NotAcceptableException,
-  UnauthorizedException,
-  UnprocessableEntityException
+  ConflictException,
+  Injectable,
+  NotAcceptableException,
+  UnauthorizedException
 } from "@nestjs/common";
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -15,11 +15,9 @@ import {UserRepository} from "./user.repository";
 import {User, UserDocument} from "./entities/user.entity";
 import { deleteFile } from "@libs/helpers/file-processor";
 import {ConfigService} from "@nestjs/config";
-import { AuthEmailService } from "@libs/mail/auth-email/auth-email.service";
 import { IFilterableCollection } from "@libs/helpers/response-controller";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { events } from "@config/constants";
-import { SupportEvent } from "@app/support/events/support.event";
 import { UserEvent } from "@app/user/events/user.event";
 
 @Injectable()
