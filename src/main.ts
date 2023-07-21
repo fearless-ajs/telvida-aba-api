@@ -29,7 +29,6 @@ async function bootstrap() {
   const rmqService = app.get<RmqService>(RmqService);
   app.connectMicroservice<RmqOptions>(rmqService.getOptions(configService.get('RABBIT_MQ_ABA_QUEUE'), true));
 
-
   // Attaching the validation piper at the global level
   app.useGlobalPipes(new CustomValidationPipe());
 

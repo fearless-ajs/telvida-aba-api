@@ -11,7 +11,6 @@ import mongoose, { Connection, FilterQuery, Model, SaveOptions, Types, UpdateQue
 import { AbstractDocument } from "./abstract.entity";
 import { Request } from "express";
 import APIFeatures from "@libs/helpers/api_features";
-import { appInfo } from "@config/config";
 import { IFilterableCollection } from "@libs/helpers/response-controller";
 
 export type TQuery = {

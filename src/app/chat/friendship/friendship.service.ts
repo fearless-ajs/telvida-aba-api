@@ -36,6 +36,20 @@ export class FriendshipService {
     });
   }
 
+  async findOne(id: string): Promise<Friendship> {
+    // verify the id
+    if (!mongoose.isValidObjectId(id)){
+      throw new NotAcceptableException(`Invalid friendship id: ${id}`)
+    }
+
+    const friendship = await this.friendshipRepo.documentExist({ _id: id });
+    if (!friendship){
+      throw new NotFoundException(`Friendship not found with the id: ${id}`)
+    }
+
+    return friendship;
+  }
+
   async findAll(req: Request): Promise<IFilterableCollection> {
     return this.friendshipRepo.findAllFiltered(req);
   }

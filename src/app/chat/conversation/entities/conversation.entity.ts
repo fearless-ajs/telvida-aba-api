@@ -14,16 +14,31 @@ export class Conversation extends AbstractDocument{
   friendship_id: string;
 
   @Prop({
-    required: true
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
   })
-  message: string;
+  sender_id: string;
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  })
+  receiver_id: string;
+
+  @Prop({
+    required: false
+  })
+  message?: string;
 
   @Prop({
     required: true,
     default: 'sent' // sent, delivered, read
   })
-  status: string;
+  status?: string;
 
+  attachments?: any[];
 }
 
 export const ConversationSchema = SchemaFactory.createForClass(Conversation);

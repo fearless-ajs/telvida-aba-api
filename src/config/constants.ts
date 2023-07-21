@@ -17,5 +17,17 @@ export const events = {
 
   FRIENDSHIP_CREATED: 'FRIENDSHIP_CREATED',
   FRIENDSHIP_DELETED: 'FRIENDSHIP_DELETED',
+
+  CONVERSATION_CREATED: 'CONVERSATION_CREATED',
+  CONVERSATION_DELETED: 'CONVERSATION_DELETED'
 }
 
+export const allowedFileTypes = [
+  '.jpeg', '.jpg', '.png', '.gif', '.pdf',
+  '.docx', '.xls', '.xlsx', '.ppt', '.pptx',
+  '.txt', '.gif', '.zip', '.doc', '.mp3',
+  '.wav', '.mp4', '.avi', '.mov', '.wmv',
+  '.csv', '.webp'
+]
+
+export const maxFileSize = 100000000; // 100MB in bytes

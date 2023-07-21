@@ -1,26 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { CreateConversationAttachmentDto } from './dto/create-conversation-attachment.dto';
-import { UpdateConversationAttachmentDto } from './dto/update-conversation-attachment.dto';
+import { ConversationAttachmentRepository } from "@app/chat/conversation-attachment/conversation-attachment.repository";
+import { ConversationAttachment } from "@app/chat/conversation-attachment/entities/conversation-attachment.entity";
 
 @Injectable()
 export class ConversationAttachmentService {
-  create(createConversationAttachmentDto: CreateConversationAttachmentDto) {
-    return 'This action adds a new conversationAttachment';
+  constructor(
+    private readonly conversationAttachmentRepo: ConversationAttachmentRepository,
+  ) {}
+
+  async create(createConversationAttachmentDto: CreateConversationAttachmentDto): Promise<ConversationAttachment> {
+    return this.conversationAttachmentRepo.create(createConversationAttachmentDto);
   }
 
-  findAll() {
-    return `This action returns all conversationAttachment`;
+  async findAll(conversation_id: string): Promise<ConversationAttachment[]> {
+    return this.conversationAttachmentRepo.find({ conversation_id });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} conversationAttachment`;
+
+  async findByConversation(conversation_id: string): Promise<ConversationAttachment[]> {
+    return this.conversationAttachmentRepo.find({ conversation_id });
   }
 
-  update(id: number, updateConversationAttachmentDto: UpdateConversationAttachmentDto) {
-    return `This action updates a #${id} conversationAttachment`;
+  findOne(id: string) {
+    return this.conversationAttachmentRepo.find({ _id: id });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} conversationAttachment`;
+  async remove(filterQuery: any): Promise<ConversationAttachment> {
+    return this.conversationAttachmentRepo.findAndDelete(filterQuery);
+  }
+
+  async removeById(id: string): Promise<ConversationAttachment> {
+    return this.conversationAttachmentRepo.findAndDelete({ _id: id });
   }
 }

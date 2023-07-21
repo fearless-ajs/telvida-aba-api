@@ -51,7 +51,7 @@ export class AuthEmailService {
       }
     }
 
-    const subject: string = ` Resending Verification Token - Complete Your Account`
+    const subject: string = `Resending Verification Token - Complete Your Account`
     await this.emailEngineService.sendHtmlEmail([email],  subject, `auth/resend-verification-token`, payload);
   }
 

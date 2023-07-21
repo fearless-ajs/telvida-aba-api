@@ -3,6 +3,7 @@ import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import {AbstractDocument} from "@libs/database/abstract.entity";
 import { Exclude } from "class-transformer";
 
+
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({ versionKey: false })

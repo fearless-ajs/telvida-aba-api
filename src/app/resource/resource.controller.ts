@@ -8,25 +8,21 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
-  UseInterceptors, UploadedFile, ParseFilePipe, Req, UnprocessableEntityException, Query
+  UseInterceptors, UploadedFile, ParseFilePipe, Req
 } from "@nestjs/common";
 import { ResourceService } from './resource.service';
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
 import ResponseController, {
   IResponseWithData,
-  IResponseWithDataCollection,
   IResponseWithMessage
 } from "@libs/helpers/response-controller";
 import { GetCurrentUserId } from "@libs/decorators";
 import { diskStorage } from "multer";
 import { extname } from "path";
 import { Request } from "express";
-import { ApiConsumes, ApiTags } from "@nestjs/swagger";
-import { FileUploadInterceptor } from "@libs/interceptors/file-upload.interceptor";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { UpdateUserDto } from "@app/user/dto/update-user.dto";
-import { TQuery } from "@libs/database/abstract.repository";
+
 
 const allowedFileTypes = ['.jpeg', '.jpg', '.png', '.gif', '.pdf', '.docx', '.doc', '.mp3', '.wav', '.mp4'];
 const maxFileSize = 100000000; // 100MB in bytes
