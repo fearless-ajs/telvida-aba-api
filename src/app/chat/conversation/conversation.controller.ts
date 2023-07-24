@@ -24,6 +24,7 @@ import { FilesInterceptor } from "@nestjs/platform-express";
 import { extname } from "path";
 import { diskStorage } from "multer";
 import { allowedFileTypes, maxFileSize } from "@config/constants";
+import { DeleteConversationDto } from "@app/chat/conversation/dto/delete-conversation.dto";
 
 
 @Controller('conversations')
@@ -73,10 +74,10 @@ export class ConversationController extends ResponseController{
     return this.responseWithDataCollection(response_data);
   }
 
-  @Delete(':id')
+  @Delete()
   @HttpCode(HttpStatus.ACCEPTED)
-  async remove(@Param('id') id: string): Promise<IResponseWithMessage> {
-    await this.conversationService.remove(id);
+  async remove(@Body() deleteConversationDto: DeleteConversationDto, @GetCurrentUserId() userId: string): Promise<IResponseWithMessage> {
+    await this.conversationService.remove(deleteConversationDto, userId);
     return this.responseMessage('Conversation deleted');
   }
 }

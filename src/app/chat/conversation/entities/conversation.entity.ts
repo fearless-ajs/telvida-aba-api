@@ -38,6 +38,24 @@ export class Conversation extends AbstractDocument{
   })
   status?: string;
 
+  @Prop({
+    required: false,
+    default: false
+  })
+  deleteForReceiver?: boolean;
+
+  @Prop({
+    required: false,
+    default: false
+  })
+  deleteForSender?: boolean;
+
+  @Prop({
+    required: false,
+    default: false
+  })
+  deleteForEveryone?: boolean;
+
   attachments?: any[];
 }
 

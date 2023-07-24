@@ -17,6 +17,9 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import { ConversationAttachmentService } from "@app/chat/conversation-attachment/conversation-attachment.service";
 import { deleteFile } from "@libs/helpers/file-processor";
 import mongoose from "mongoose";
+import { DeleteConversationDto } from "@app/chat/conversation/dto/delete-conversation.dto";
+import { ConversationAttachment } from "@app/chat/conversation-attachment/entities/conversation-attachment.entity";
+import { first } from "rxjs";
 
 type ConversationFilter = {
   friendship_id: string
@@ -33,6 +36,12 @@ export class ConversationService {
 
   async create(createConversationDto: CreateConversationDto, files: any[], senderId: string): Promise<Conversation> {
     const { friendship_id, message } = createConversationDto;
+
+    // Check if the friendship_id is valid
+    if (!mongoose.isValidObjectId(friendship_id)){
+      throw new NotAcceptableException(`Invalid friendship_id: ${friendship_id}`);
+    }
+
     let target_id;
 
     // Fetch friendship
@@ -129,33 +138,128 @@ export class ConversationService {
     return this.conversationRepo.findAllFiltered(req);
   }
 
-  async remove(id: string): Promise<boolean> {
-    // check if the id is valid
-    if (!mongoose.isValidObjectId(id)){
-      throw new NotAcceptableException(`Invalid conversation id: ${id}`)
+  async remove(deleteConversationDto: DeleteConversationDto, userId: string): Promise<boolean> {
+    const { friendship_id, conversation_ids, delete_type } = deleteConversationDto;
+
+    // Check if the friendship_id is valid
+    if (!mongoose.isValidObjectId(friendship_id)){
+      throw new NotAcceptableException(`Invalid friendship_id: ${friendship_id}`);
     }
 
-    // Fetch conversation data
-    const conversation = await this.conversationRepo.documentExist({ _id: id });
-    if (!conversation){
-      throw new NotFoundException(`Conversation not found with the id: ${id}`)
+    // check if the user belongs to the friendship
+    // Fetch friendship
+    const friendship = await this.friendshipService.findOne(friendship_id)
+    const { initiator_id, receiver_id } = friendship;
+
+    // Determine the friendship validity
+    if (initiator_id.toString() !== userId && receiver_id.toString() === userId){
+      throw new ConflictException("This friendship does not belong to the user")
     }
 
-    // Fetch the conversation attachments
-    const attachments =  await this.conversationAttachmentService.findByConversation(conversation._id.toString());
+    // Validate all Ids
+    let faulty_conversation_ids:string[] = [];
+    for (const conversation_id of conversation_ids) {
+      // check if the id is valid
+      if (!mongoose.isValidObjectId(conversation_id)){
+        faulty_conversation_ids.push(conversation_id);
+      }
+    }
 
-    // Create a database transaction for the delete operation
+    // Return the faulty conversation_ids as errors
+    if (faulty_conversation_ids.length > 0){
+      throw new NotAcceptableException({
+        message: 'Invalid conversation_ids',
+        invalids:  faulty_conversation_ids
+      })
+    }
+
+    /*
+     * Check if the conversation exists
+     * Check if it belongs to the user.
+     * i.e. the user is either the sender or the receiver
+    */
+    let unknown_conversation_ids:string[] = [];
+    let valid_conversations: Conversation[] = [];
+    for (const conversation_id of conversation_ids) {
+      // check if the conversation exists
+      const conversation = await this.conversationRepo.documentExist({
+        $and: [
+          { _id: conversation_id },
+          { friendship_id },
+          {
+            $or: [
+              { sender_id: userId },
+              { receiver_id: userId },
+            ],
+          },
+        ],
+      });
+      if (conversation){
+        valid_conversations.push(conversation);
+      }else {
+        unknown_conversation_ids.push(conversation_id)
+      }
+    }
+
+    // Return the unknown conversation_ids as errors
+    if (unknown_conversation_ids.length > 0){
+      throw new NotFoundException({
+        message: 'Unknown conversation_ids',
+        invalids:  unknown_conversation_ids
+      })
+    }
+
+
+    // Create a database transaction for the delete operation, not actually deleting but updating
     const session = await this.conversationRepo.startTransaction();
     try {
-      // Delete all attachments and uploaded files
-      for (const file of attachments) {
-        await this.conversationAttachmentService.removeById(file._id.toString())
-        await deleteFile(file.path);
+      /*
+        *
+        * Check for incompatible delete types
+        * Only sender can delete for everyone
+        * delete for everyone must be within 2 days
+        * delete for me is for anyone
+        *
+     */
+      if (delete_type === 'for_me'){
+        for (const conversation of valid_conversations) {
+          // Check if the user is the sender or the receiver
+          if(conversation.receiver_id === userId){
+            await this.conversationRepo.findOneAndUpdate({ _id: conversation._id }, {
+              deleteForReceiver: true
+            });
+          }
+
+          if(conversation.sender_id === userId){
+            await this.conversationRepo.findOneAndUpdate({ _id: conversation._id }, {
+              deleteForSender: true
+            });
+          }
+        }
       }
 
-      // Now delete the conversation
-      await this.conversationRepo.findAndDelete({ _id: id });
+      if (delete_type === 'for_everyone') {
+        for (const conversation of valid_conversations) {
+          if(conversation.sender_id === userId){
+            // Check if the current date is not two days ahead of the creator
+            // Step 1: Calculate the time difference in milliseconds.
+            const updatedAt: Date = new Date(conversation.createdAt); // Replace with the actual value of `updatedAt` from your document.
+            const currentTime: Date = new Date();
+            const timeDifference: number = currentTime.getTime() - updatedAt.getTime();
 
+            // Step 2: Convert time difference to days.
+            const millisecondsPerDay: number = 24 * 60 * 60 * 1000; // Number of milliseconds in one day.
+            const daysDifference: number = timeDifference / millisecondsPerDay;
+
+            // Step 3: Check if the time difference is less than or equal to two days.
+            if (daysDifference <= 2) {
+              await this.conversationRepo.findOneAndUpdate({ _id: conversation._id }, {
+                deleteForEveryone: true
+              });
+            }
+          }
+        }
+      }
       // Commit transaction
       await session.commitTransaction();
       return true;
@@ -166,4 +270,6 @@ export class ConversationService {
       throw new UnprocessableEntityException(err.getMessage());
     }
   }
+
+
 }
