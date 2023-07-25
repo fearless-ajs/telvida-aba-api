@@ -169,7 +169,9 @@ export class ConversationService {
     if (faulty_conversation_ids.length > 0){
       throw new NotAcceptableException({
         message: 'Invalid conversation_ids',
-        invalids:  faulty_conversation_ids
+        data:  {
+          invalids: faulty_conversation_ids
+        }
       })
     }
 
@@ -205,10 +207,11 @@ export class ConversationService {
     if (unknown_conversation_ids.length > 0){
       throw new NotFoundException({
         message: 'Unknown conversation_ids',
-        invalids:  unknown_conversation_ids
+        data:  {
+          invalids: unknown_conversation_ids
+        }
       })
     }
-
 
     // Create a database transaction for the delete operation, not actually deleting but updating
     const session = await this.conversationRepo.startTransaction();
@@ -224,13 +227,13 @@ export class ConversationService {
       if (delete_type === 'for_me'){
         for (const conversation of valid_conversations) {
           // Check if the user is the sender or the receiver
-          if(conversation.receiver_id === userId){
+          if(conversation.receiver_id.toString() === userId){
             await this.conversationRepo.findOneAndUpdate({ _id: conversation._id }, {
               deleteForReceiver: true
             });
           }
 
-          if(conversation.sender_id === userId){
+          if(conversation.sender_id.toString() === userId){
             await this.conversationRepo.findOneAndUpdate({ _id: conversation._id }, {
               deleteForSender: true
             });
@@ -240,7 +243,7 @@ export class ConversationService {
 
       if (delete_type === 'for_everyone') {
         for (const conversation of valid_conversations) {
-          if(conversation.sender_id === userId){
+          if(conversation.sender_id.toString() === userId){
             // Check if the current date is not two days ahead of the creator
             // Step 1: Calculate the time difference in milliseconds.
             const updatedAt: Date = new Date(conversation.createdAt); // Replace with the actual value of `updatedAt` from your document.
@@ -267,7 +270,7 @@ export class ConversationService {
       // Abort database transaction and reverse all effects
       await session.abortTransaction();
       // Throw exception containing the error message
-      throw new UnprocessableEntityException(err.getMessage());
+      throw new UnprocessableEntityException("Something went wrong");
     }
   }
 

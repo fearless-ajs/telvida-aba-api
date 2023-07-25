@@ -28,7 +28,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const errorResponse = exception.getResponse() as {
       status: string,
-      data: any,
+      data?: any,
       message: string,
     };
 

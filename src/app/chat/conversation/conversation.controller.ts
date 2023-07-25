@@ -62,7 +62,6 @@ export class ConversationController extends ResponseController{
   async create(@Body() createConversationDto: CreateConversationDto, @GetCurrentUserId() userId: string,
                @UploadedFiles() files: Array<Express.Multer.File>
                ): Promise<IResponseWithData> {
-    console.log(userId);
     const response_data = await this.conversationService.create(createConversationDto, files, userId);
     return this.responseWithData(response_data);
   }

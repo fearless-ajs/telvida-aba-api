@@ -8,14 +8,13 @@ export class DeleteConversationDto {
   @CustomValidation()
   friendship_id: string
 
-  @IsNotEmpty()
   @IsArray()
   @ArrayNotEmpty()
   @IsString({ each: true })
   @CustomValidation()
   conversation_ids: string[]
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   @IsEnum([
     'for_me',
