@@ -20,9 +20,10 @@ import mongoose from "mongoose";
 import { DeleteConversationDto } from "@app/chat/conversation/dto/delete-conversation.dto";
 import { ConversationAttachment } from "@app/chat/conversation-attachment/entities/conversation-attachment.entity";
 import { first } from "rxjs";
+import { TQuery } from "@libs/database/abstract.repository";
 
 type ConversationFilter = {
-  friendship_id: string
+  friendship_id: string,
 }
 
 @Injectable()
@@ -114,7 +115,8 @@ export class ConversationService {
   }
 
   async findAll(req: Request, userId: string): Promise<IFilterableCollection> {
-    const { filter } = req.query as { filter: ConversationFilter };
+    const { filter } = req.query as unknown as TQuery;
+    filter.deleteForEveryone = false; // excludes the delete_for_everyone
 
     if (!filter || !filter.friendship_id) {
       throw new UnprocessableEntityException('You need to filter by friendship_id, like this: /conversations?filter[friendship_id]=sample_id');
@@ -135,7 +137,22 @@ export class ConversationService {
       throw new NotAcceptableException(`User does not belong to the friendship`)
     }
 
-    return this.conversationRepo.findAllFiltered(req);
+
+    // Construct the delete_for_me query
+    const dbQuery = {
+      $and: [
+        { friendship_id },
+        {
+          $and: [
+            { senderId: { $ne: userId } },
+            { deleteForSender: { $ne: true } }
+          ]
+        },
+      ],
+    }
+
+    // Add filter by delete_for_me and delete_for_everyone
+    return this.conversationRepo.findAllFiltered(req, dbQuery);
   }
 
   async remove(deleteConversationDto: DeleteConversationDto, userId: string): Promise<boolean> {

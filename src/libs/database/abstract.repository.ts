@@ -134,13 +134,13 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     return this.model.find(filterQuery, {}, { lean: true });
   }
 
-  async findAllFiltered(@Req() request: Request): Promise<IFilterableCollection> {
+  async findAllFiltered(@Req() request: Request, dbQuery: FilterQuery<TDocument> = {}): Promise<IFilterableCollection> {
     const {
       page = 1,
       perPage = 15,
       sortBy,
       sortOrder = 'asc',
-      filter,
+      filter
     }  = request.query as unknown as TQuery;
 
 
@@ -148,7 +148,7 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     const endIndex = page * perPage;
 
     // Create a query object to build the MongoDB query
-    const queryObject = {};
+    const queryObject = dbQuery;
 
     // Apply the filter if it is provided
     if (filter) {
@@ -159,7 +159,7 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     // Create a sort object based on sortBy and sortOrder
     const sortObject = {};
     if (sortBy) {
-      sortObject[sortBy] = sortOrder === 'asc' ? 1 : -1;
+      (sortObject as any)[sortBy] = sortOrder === 'asc' ? 1 : -1;
     }
 
     // Perform the database query with the filter, sort, skip, and limit
