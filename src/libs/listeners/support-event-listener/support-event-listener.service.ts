@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from "@nestjs/event-emitter";
 import { events } from "@config/constants";
-import { SupportEvent } from "@app/support/events/support.event";
+import { SupportEvent } from "@app/versions/v1/REST/events/support/support.event";
 import { SupportEmailService } from "@libs/mail/support-email/support-email.service";
 
 @Injectable()

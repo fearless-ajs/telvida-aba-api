@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from "@app/user/entities/user.entity";
+import { User } from "@app/versions/v1/REST/entities/user.entity";
 import { appInfo } from "@config/config";
 import { EmailEngineService } from "@libs/mail/email-engine/email-engine.service";
 
