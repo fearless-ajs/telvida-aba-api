@@ -6,7 +6,7 @@ import {
   NotAcceptableException,
 } from "@nestjs/common";
 import { Observable } from 'rxjs';
-import {AccessTokenRepository} from "@app/versions/v1/REST/repositories/access-token.repository";
+import {AccessTokenRepository} from "@app/v1/REST/repositories/access-token.repository";
 import { errors } from "@config/config";
 
 @Injectable()

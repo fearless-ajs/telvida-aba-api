@@ -1,4 +1,4 @@
-import { User } from "@app/versions/v1/REST/entities/user.entity";
+import { User } from "@app/v1/REST/entities/user.entity";
 
 export type TTokens = {
   user?: User,

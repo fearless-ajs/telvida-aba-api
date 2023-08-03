@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { AuthEmailService } from '@libs/mail/auth-email/auth-email.service';
 import { OnEvent } from '@nestjs/event-emitter';
 import { events } from '@config/constants';
-import { UserEvent } from '@app/versions/v1/REST/events/user/user.event';
-import { ForgotPasswordEvent } from '@app/versions/v1/REST/events/auth/forgot-password.event';
-import { UserLoggedInEvent } from '@app/versions/v1/REST/events/auth/user-logged-in.event';
+import { UserEvent } from '@app/v1/REST/events/user/user.event';
+import { ForgotPasswordEvent } from '@app/v1/REST/events/auth/forgot-password.event';
+import { UserLoggedInEvent } from '@app/v1/REST/events/auth/user-logged-in.event';
 
 @Injectable()
 export class AuthEventListenerService {

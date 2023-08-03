@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { OnEvent } from "@nestjs/event-emitter";
 import { events } from "@config/constants";
 import { UserEmailService } from "@libs/mail/user-email/user-email.service";
-import { UserEvent } from "@app/versions/v1/REST/events/user/user.event";
+import { UserEvent } from "@app/v1/REST/events/user/user.event";
 
 @Injectable()
 export class UserEventListenerService {

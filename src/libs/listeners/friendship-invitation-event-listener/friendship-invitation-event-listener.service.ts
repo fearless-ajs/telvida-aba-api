@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { OnEvent } from "@nestjs/event-emitter";
 import { events } from "@config/constants";
 import { FriendshipInvitationEmailService } from "@libs/mail/friendship-invitation-email/friendship-invitation-email.service";
-import { FriendshipInvitationCreatedEvent } from "@app/versions/v1/REST/events/chat/friendship-invitation/friendship-invitation-created.event";
-import { FriendshipInvitationAcceptedEvent } from "@app/versions/v1/REST/events/chat/friendship-invitation/friendship-invitation-accepted.event";
-import { FriendshipInvitationDeclinedEvent } from "@app/versions/v1/REST/events/chat/friendship-invitation/friendship-invitation-declined.event";
+import { FriendshipInvitationCreatedEvent } from "@app/v1/REST/events/chat/friendship-invitation/friendship-invitation-created.event";
+import { FriendshipInvitationAcceptedEvent } from "@app/v1/REST/events/chat/friendship-invitation/friendship-invitation-accepted.event";
+import { FriendshipInvitationDeclinedEvent } from "@app/v1/REST/events/chat/friendship-invitation/friendship-invitation-declined.event";
 
 @Injectable()
 export class FriendshipInvitationEventListenerService {

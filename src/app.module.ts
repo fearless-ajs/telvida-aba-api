@@ -1,30 +1,30 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { UserModule } from '@app/versions/v1/REST/modules/user.module';
+import { UserModule } from '@app/v1/REST/modules/user.module';
 import { DatabaseModule } from '@libs/database/database.module';
-import { AuthModule } from '@app/versions/v1/REST/modules/auth.module';
+import { AuthModule } from '@app/v1/REST/modules/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import JwtAuthGuard from '@libs/Guards/jwt-auth/jwt-auth.guard';
-import { AccessTokenModule } from '@app/versions/v1/REST/modules/access-token.module';
+import { AccessTokenModule } from '@app/v1/REST/modules/access-token.module';
 import { ProtectedRouteGuard } from '@libs/Guards/protected-route/protected-route.guard';
-import { AccessTokenRepository } from '@app/versions/v1/REST/repositories/access-token.repository';
+import { AccessTokenRepository } from '@app/v1/REST/repositories/access-token.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
   AccessToken,
   AccessTokenSchema,
-} from '@app/versions/v1/REST/entities/access-token.entity';
+} from '@app/v1/REST/entities/access-token.entity';
 import { MulterModule } from '@nestjs/platform-express';
-import { EventModule } from '@app/versions/v1/REST/modules/event.module';
-import { ResourceModule } from '@app/versions/v1/REST/modules/resource.module';
-import { SupportModule } from '@app/versions/v1/REST/modules/support.module';
+import { EventModule } from '@app/v1/REST/modules/event.module';
+import { ResourceModule } from '@app/v1/REST/modules/resource.module';
+import { SupportModule } from '@app/v1/REST/modules/support.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EventsListenerModule } from '@libs/listeners/events-listener/events-listener.module';
-import { ConversationModule } from '@app/versions/v1/REST/modules/conversation.module';
-import { ConversationAttachmentModule } from '@app/versions/v1/REST/modules/conversation-attachment.module';
-import { FriendshipModule } from '@app/versions/v1/REST/modules/friendship.module';
-import { FriendshipInvitationModule } from '@app/versions/v1/REST/modules/friendship-invitation.module';
+import { ConversationModule } from '@app/v1/REST/modules/conversation.module';
+import { ConversationAttachmentModule } from '@app/v1/REST/modules/conversation-attachment.module';
+import { FriendshipModule } from '@app/v1/REST/modules/friendship.module';
+import { FriendshipInvitationModule } from '@app/v1/REST/modules/friendship-invitation.module';
 
 @Module({
   imports: [
