@@ -20,7 +20,7 @@ import mongoose from 'mongoose';
 import { DeleteConversationDto } from '@app/v1/REST/dto/chat/conversation/delete-conversation.dto';
 import { TQuery } from '@libs/database/abstract.repository';
 import { ConversationsFetchEvent } from '@app/v1/REST/events/chat/conversation/conversations-fetch.event';
-import { ConversationDeletedEvent } from "@app/v1/REST/events/chat/conversation/conversation-deleted.event";
+import { ConversationDeletedEvent } from '@app/v1/REST/events/chat/conversation/conversation-deleted.event';
 
 @Injectable()
 export class ConversationService {
@@ -330,7 +330,7 @@ export class ConversationService {
       await session.commitTransaction();
       this.eventEmitter.emit(
         events.FETCH_CONVERSATIONS,
-        new ConversationDeletedEvent('SUCCESS', 'Message deleted'),
+        new ConversationDeletedEvent('SUCCESS', valid_conversations),
       );
       return true;
     } catch (err) {

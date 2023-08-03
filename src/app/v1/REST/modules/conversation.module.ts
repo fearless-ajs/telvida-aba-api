@@ -20,5 +20,6 @@ import { ConversationAttachmentModule } from '@app/v1/REST/modules/conversation-
   ],
   controllers: [ConversationController],
   providers: [ConversationService, ConversationRepository],
+  exports: [ConversationService],
 })
 export class ConversationModule {}

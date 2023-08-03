@@ -7,6 +7,7 @@ import { AuthEmailModule } from '@libs/mail/auth-email/auth-email.module';
 import { UserEmailModule } from '@libs/mail/user-email/user-email.module';
 import { FriendshipInvitationEventListenerService } from '@libs/listeners/friendship-invitation-event-listener/friendship-invitation-event-listener.service';
 import { FriendshipInvitationEmailModule } from '@libs/mail/friendship-invitation-email/friendship-invitation-email.module';
+import { ConversationEventListenerService } from '@libs/listeners/conversation-event-listener/conversation-event-listener.service';
 
 @Module({
   providers: [
@@ -14,6 +15,7 @@ import { FriendshipInvitationEmailModule } from '@libs/mail/friendship-invitatio
     AuthEventListenerService,
     SupportEventListenerService,
     FriendshipInvitationEventListenerService,
+    ConversationEventListenerService,
   ],
   imports: [
     SupportEmailModule,

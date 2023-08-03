@@ -25,6 +25,7 @@ import { ConversationModule } from '@app/v1/REST/modules/conversation.module';
 import { ConversationAttachmentModule } from '@app/v1/REST/modules/conversation-attachment.module';
 import { FriendshipModule } from '@app/v1/REST/modules/friendship.module';
 import { FriendshipInvitationModule } from '@app/v1/REST/modules/friendship-invitation.module';
+import { SocketEngineModule } from '@libs/socket-engine/socket-engine.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { FriendshipInvitationModule } from '@app/v1/REST/modules/friendship-invi
     ConversationAttachmentModule,
     FriendshipModule,
     FriendshipInvitationModule,
+    SocketEngineModule,
   ],
   providers: [
     AccessTokenRepository,
