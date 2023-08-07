@@ -1,13 +1,21 @@
-import { Controller, Get, Param, Delete, HttpCode, HttpStatus, Req } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Param,
+  Delete,
+  HttpCode,
+  HttpStatus,
+  Req,
+} from '@nestjs/common';
 import { FriendshipService } from '../../../services/chat/friendship/friendship.service';
 import ResponseController, {
   IResponseWithDataCollection,
-  IResponseWithMessage
-} from "@libs/helpers/response-controller";
-import { Request } from "express";
+  IResponseWithMessage,
+} from '@libs/helpers/response-controller';
+import { Request } from 'express';
 
 @Controller('friendships')
-export class FriendshipController extends ResponseController{
+export class FriendshipController extends ResponseController {
   constructor(private readonly friendshipService: FriendshipService) {
     super();
   }
