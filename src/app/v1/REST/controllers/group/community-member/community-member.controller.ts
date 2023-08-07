@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { CommunityMemberService } from '../../../../../../sb/community-member/community-member.service';
-import { CreateCommunityMemberDto } from '../../../../../../sb/community-member/dto/create-community-member.dto';
-import { UpdateCommunityMemberDto } from '../../../../../../sb/community-member/dto/update-community-member.dto';
+import { CommunityMemberService } from '../../../services/group/community-member/community-member.service';
+import { CreateCommunityMemberDto } from '../../../dto/group/community-member/create-community-member.dto';
+import { UpdateCommunityMemberDto } from '../../../dto/group/community-member/update-community-member.dto';
 
 @Controller('community-member')
 export class CommunityMemberController {

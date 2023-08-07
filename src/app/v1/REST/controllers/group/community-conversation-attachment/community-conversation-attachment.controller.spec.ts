@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CommunityConversationAttachmentController } from './community-conversation-attachment.controller';
-import { CommunityConversationAttachmentService } from '../../../../../../sb/community-conversation-attachment/community-conversation-attachment.service';
+import { CommunityConversationAttachmentService } from '../../../services/group/community-conversation-attachment/community-conversation-attachment.service';
 
 describe('CommunityConversationAttachmentController', () => {
   let controller: CommunityConversationAttachmentController;

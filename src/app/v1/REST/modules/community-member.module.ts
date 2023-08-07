@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { CommunityMemberService } from './community-member.service';
+import { CommunityMemberService } from '../services/group/community-member/community-member.service';
 import { CommunityMemberController } from '@app/v1/REST/controllers/group/community-member/community-member.controller';
 
 @Module({

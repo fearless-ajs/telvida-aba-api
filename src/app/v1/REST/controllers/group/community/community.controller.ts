@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { CommunityService } from '../../../../../../sb/community/community.service';
+import { CommunityService } from '../../../services/group/community/community.service';
 import { CreateCommunityDto } from '../../../dto/group/community/create-community.dto';
 import { UpdateCommunityDto } from '../../../dto/group/community/update-community.dto';
 

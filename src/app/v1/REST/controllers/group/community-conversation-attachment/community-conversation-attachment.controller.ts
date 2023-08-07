@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { CommunityConversationAttachmentService } from '../../../../../../sb/community-conversation-attachment/community-conversation-attachment.service';
-import { CreateCommunityConversationAttachmentDto } from '../../../../../../sb/community-conversation-attachment/dto/create-community-conversation-attachment.dto';
-import { UpdateCommunityConversationAttachmentDto } from '../../../../../../sb/community-conversation-attachment/dto/update-community-conversation-attachment.dto';
+import { CommunityConversationAttachmentService } from '../../../services/group/community-conversation-attachment/community-conversation-attachment.service';
+import { CreateCommunityConversationAttachmentDto } from '../../../dto/group/community-conversation-attachment/create-community-conversation-attachment.dto';
+import { UpdateCommunityConversationAttachmentDto } from '../../../dto/group/community-conversation-attachment/update-community-conversation-attachment.dto';
 
 @Controller('community-conversation-attachment')
 export class CommunityConversationAttachmentController {

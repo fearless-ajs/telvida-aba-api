@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CommunityController } from './community.controller';
-import { CommunityService } from '../../../../../../sb/community/community.service';
+import { CommunityService } from '../../../services/group/community/community.service';
 
 describe('CommunityController', () => {
   let controller: CommunityController;

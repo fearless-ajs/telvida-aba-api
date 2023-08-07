@@ -26,11 +26,11 @@ import { ConversationAttachmentModule } from '@app/v1/REST/modules/conversation-
 import { FriendshipModule } from '@app/v1/REST/modules/friendship.module';
 import { FriendshipInvitationModule } from '@app/v1/REST/modules/friendship-invitation.module';
 import { SocketEngineModule } from '@libs/socket-engine/socket-engine.module';
-import { CommunityModule } from './sb/community/community.module';
-import { CommunityInvitationModule } from './sb/community-invitation/community-invitation.module';
-import { CommunityMemberModule } from './sb/community-member/community-member.module';
-import { CommunityConversationModule } from './sb/community-conversation/community-conversation.module';
-import { CommunityConversationAttachmentModule } from './sb/community-conversation-attachment/community-conversation-attachment.module';
+import { CommunityModule } from '@app/v1/REST/modules/community.module';
+import { CommunityInvitationModule } from '@app/v1/REST/modules/community-invitation.module';
+import { CommunityMemberModule } from '@app/v1/REST/modules/community-member.module';
+import { CommunityConversationModule } from '@app/v1/REST/modules/community-conversation.module';
+import { CommunityConversationAttachmentModule } from '@app/v1/REST/modules/community-conversation-attachment.module';
 
 @Module({
   imports: [
