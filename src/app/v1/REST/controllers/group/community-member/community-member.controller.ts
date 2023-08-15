@@ -7,28 +7,28 @@ import { UpdateCommunityMemberDto } from '../../../dto/group/community-member/up
 export class CommunityMemberController {
   constructor(private readonly communityMemberService: CommunityMemberService) {}
 
-  @Post()
-  create(@Body() createCommunityMemberDto: CreateCommunityMemberDto) {
-    return this.communityMemberService.create(createCommunityMemberDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.communityMemberService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.communityMemberService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCommunityMemberDto: UpdateCommunityMemberDto) {
-    return this.communityMemberService.update(+id, updateCommunityMemberDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.communityMemberService.remove(+id);
-  }
+  // @Post()
+  // create(@Body() createCommunityMemberDto: CreateCommunityMemberDto) {
+  //   return this.communityMemberService.create(createCommunityMemberDto);
+  // }
+  //
+  // @Get()
+  // findAll() {
+  //   return this.communityMemberService.findAll();
+  // }
+  //
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.communityMemberService.findOne(+id);
+  // }
+  //
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateCommunityMemberDto: UpdateCommunityMemberDto) {
+  //   return this.communityMemberService.update(+id, updateCommunityMemberDto);
+  // }
+  //
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.communityMemberService.remove(+id);
+  // }
 }

@@ -1,12 +1,12 @@
-import { AbstractDocument } from "@libs/database/abstract.entity";
-import mongoose, { HydratedDocument } from "mongoose";
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { AbstractDocument } from '@libs/database/abstract.entity';
+import mongoose, { HydratedDocument } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type FriendshipDocument = HydratedDocument<Friendship>;
 
 @Schema({ versionKey: false })
 export class Friendship extends AbstractDocument {
-    @Prop({
+  @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
@@ -22,4 +22,3 @@ export class Friendship extends AbstractDocument {
 }
 
 export const FriendshipSchema = SchemaFactory.createForClass(Friendship);
-

@@ -1,25 +1,29 @@
 import {
-  HttpException,
-  HttpStatus,
   Logger,
   NotAcceptableException,
   NotFoundException,
-  Query,
-  Req
-} from "@nestjs/common";
-import mongoose, { Connection, FilterQuery, Model, SaveOptions, Types, UpdateQuery } from "mongoose";
-import { AbstractDocument } from "./abstract.entity";
-import { Request } from "express";
-import APIFeatures from "@libs/helpers/api_features";
-import { IFilterableCollection } from "@libs/helpers/response-controller";
+  Req,
+} from '@nestjs/common';
+import mongoose, {
+  Connection,
+  FilterQuery,
+  Model,
+  SaveOptions,
+  Types,
+  UpdateQuery,
+} from 'mongoose';
+import { AbstractDocument } from './abstract.entity';
+import { Request } from 'express';
+import APIFeatures from '@libs/helpers/api_features';
+import { IFilterableCollection } from '@libs/helpers/response-controller';
 
 export type TQuery = {
-  page: number,
-  perPage: number,
-  sortBy: string,
-  sortOrder: 'asc' | 'desc',
-  filter?:any,
-}
+  page: number;
+  perPage: number;
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
+  filter?: any;
+};
 
 export abstract class AbstractRepository<TDocument extends AbstractDocument> {
   protected abstract readonly logger: Logger;
@@ -37,7 +41,7 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
       ...document,
       _id: new Types.ObjectId(),
       createdAt: Date.now(),
-      updatedAt: Date.now()
+      updatedAt: Date.now(),
     });
     return (
       await createdDocument.save(options)
@@ -48,27 +52,37 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     const document = await this.documentExist(filterQuery);
 
     if (!document) {
-      this.logger.warn(`${this.model.modelName} not found with filterQuery:`, filterQuery);
+      this.logger.warn(
+        `${this.model.modelName} not found with filterQuery:`,
+        filterQuery,
+      );
       throw new NotFoundException(`${this.model.modelName} not found.`);
     }
 
     return document;
   }
 
-
-  async findLastOne(filterQuery: FilterQuery<TDocument> = {}): Promise<TDocument> {
-    const document = await this.model.findOne(filterQuery, {}, { lean: true }).sort({createdAt: -1})
+  async findLastOne(
+    filterQuery: FilterQuery<TDocument> = {},
+  ): Promise<TDocument> {
+    const document = await this.model
+      .findOne(filterQuery, {}, { lean: true })
+      .sort({ createdAt: -1 });
     if (!document) {
-      return null
+      return null;
     }
 
     return document;
   }
 
-  async findFirstOne(filterQuery: FilterQuery<TDocument> = {}): Promise<TDocument> {
-    const document = await this.model.findOne(filterQuery, {}, { lean: true }).sort({createdAt: 1})
+  async findFirstOne(
+    filterQuery: FilterQuery<TDocument> = {},
+  ): Promise<TDocument> {
+    const document = await this.model
+      .findOne(filterQuery, {}, { lean: true })
+      .sort({ createdAt: 1 });
     if (!document) {
-      return null
+      return null;
     }
 
     return document;
@@ -76,8 +90,10 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
 
   async findById(id: string): Promise<TDocument> {
     // check if the id is valid
-    if (!mongoose.isValidObjectId(id)){
-      throw new NotAcceptableException(`Invalid ${this.model.modelName} id: ${id}`)
+    if (!mongoose.isValidObjectId(id)) {
+      throw new NotAcceptableException(
+        `Invalid ${this.model.modelName} id: ${id}`,
+      );
     }
 
     const document = await this.documentExist({ _id: id });
@@ -93,7 +109,7 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
   async documentExist(filterQuery: FilterQuery<TDocument>): Promise<TDocument> {
     const document = await this.model.findOne(filterQuery, {}, { lean: true });
     if (!document) {
-        return null
+      return null;
     }
 
     return document;
@@ -103,13 +119,17 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     filterQuery: FilterQuery<TDocument>,
     update: UpdateQuery<TDocument>,
   ) {
-    const document = await this.model.findOneAndUpdate(filterQuery, {
-      ...update,
-      updatedAt: Date.now()
-    }, {
-      new: true,
-      runValidators: true
-    });
+    const document = await this.model.findOneAndUpdate(
+      filterQuery,
+      {
+        ...update,
+        updatedAt: Date.now(),
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
 
     if (!document) {
       this.logger.warn(`Document not found with filterQuery:`, filterQuery);
@@ -134,15 +154,17 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     return this.model.find(filterQuery, {}, { lean: true });
   }
 
-  async findAllFiltered(@Req() request: Request, dbQuery: FilterQuery<TDocument> = {}): Promise<IFilterableCollection> {
+  async findAllFiltered(
+    @Req() request: Request,
+    dbQuery: FilterQuery<TDocument> = {},
+  ): Promise<IFilterableCollection> {
     const {
       page = 1,
       perPage = 15,
       sortBy,
       sortOrder = 'asc',
-      filter
-    }  = request.query as unknown as TQuery;
-
+      filter,
+    } = request.query as unknown as TQuery;
 
     const startIndex = (page - 1) * perPage;
     const endIndex = page * perPage;
@@ -183,14 +205,26 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     // Construct the dynamic pagination links
     const links = [];
     if (currentPage > 1) {
-      links.push({ url: `${baseUrl}?page=${currentPage - 1}`, label: '&laquo; Previous', active: false });
+      links.push({
+        url: `${baseUrl}?page=${currentPage - 1}`,
+        label: '&laquo; Previous',
+        active: false,
+      });
     }
     for (let i = 1; i <= lastPage; i++) {
       const isActive = i === currentPage;
-      links.push({ url: `${baseUrl}?page=${i}`, label: i.toString(), active: isActive });
+      links.push({
+        url: `${baseUrl}?page=${i}`,
+        label: i.toString(),
+        active: isActive,
+      });
     }
     if (currentPage < lastPage) {
-      links.push({ url: `${baseUrl}?page=${currentPage + 1}`, label: 'Next &raquo;', active: false });
+      links.push({
+        url: `${baseUrl}?page=${currentPage + 1}`,
+        label: 'Next &raquo;',
+        active: false,
+      });
     }
 
     const data = {
@@ -201,10 +235,12 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
       last_page: lastPage,
       last_page_url: lastPageUrl,
       links: links,
-      next_page_url: currentPage < lastPage ? `${baseUrl}?page=${currentPage + 1}` : null,
+      next_page_url:
+        currentPage < lastPage ? `${baseUrl}?page=${currentPage + 1}` : null,
       path: baseUrl, // Use the full request URL as the path
       per_page: perPage,
-      prev_page_url: currentPage > 1 ? `${baseUrl}?page=${currentPage - 1}` : null,
+      prev_page_url:
+        currentPage > 1 ? `${baseUrl}?page=${currentPage - 1}` : null,
       to: endIndex,
       total: total,
     };
@@ -215,18 +251,20 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     };
   }
 
-  findAll  = async (req:Request, filter?:any)   => {
-
+  findAll = async (req: Request, filter?: any) => {
     // To allow for nested GET reviews on tour(hack)
     // let filter = {};
     // if (req.params.tourId) filter = { tour: req.params.tourId};
 
     //BUILD THE QUERY
-    const features = new APIFeatures(this.model.find(filter?filter:{}), req.query)
-        .filter()
-        .sort()
-        .limitFields()
-        .paginate();
+    const features = new APIFeatures(
+      this.model.find(filter ? filter : {}),
+      req.query,
+    )
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
 
     //EXECUTE THE QUERY
     const docs = await features.query;
@@ -234,9 +272,7 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     return docs;
   };
 
-  async findAndDelete(
-      filterQuery: FilterQuery<TDocument>
-  ) {
+  async findAndDelete(filterQuery: FilterQuery<TDocument>) {
     return this.model.findOneAndDelete(filterQuery);
   }
 

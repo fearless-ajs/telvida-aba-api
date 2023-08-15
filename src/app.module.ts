@@ -31,6 +31,7 @@ import { CommunityInvitationModule } from '@app/v1/REST/modules/community-invita
 import { CommunityMemberModule } from '@app/v1/REST/modules/community-member.module';
 import { CommunityConversationModule } from '@app/v1/REST/modules/community-conversation.module';
 import { CommunityConversationAttachmentModule } from '@app/v1/REST/modules/community-conversation-attachment.module';
+import { CommunityRequestModule } from '@app/v1/REST/modules/community-request.module';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { CommunityConversationAttachmentModule } from '@app/v1/REST/modules/comm
     CommunityMemberModule,
     CommunityConversationModule,
     CommunityConversationAttachmentModule,
+    CommunityRequestModule,
   ],
   providers: [
     AccessTokenRepository,
